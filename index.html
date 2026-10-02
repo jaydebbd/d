@@ -18,7 +18,7 @@
   --offline: #e37400;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-body { background-color: var(--bg); color: var(--text); padding-bottom: 95px; width: 100%; min-height: 100vh; }
+body { background-color: var(--bg); color: var(--text); padding-bottom: 110px; width: 100%; min-height: 100vh; }
 .header { background: linear-gradient(135deg, #1a73e8, #0d47a1); color: white; padding: 12px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15); width: 100%; }
 .header h1 { font-size: 19px; font-weight: 600; }
 .save-status-bar {
@@ -310,7 +310,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 95px; wi
   border-bottom: 1px dashed rgba(140, 115, 85, 0.2);
 }
 .diary-content:empty:before {
-  content: "এখানে আপনার ডায়েরির পাতা লিখুন... (নিচের মাইক চেপে কথা বললেই দ্রুত লেখা হবে)";
+  content: "এখানে আপনার ডায়েরির পাতা লিখুন... (নিচের মাইকে চাপ দিয়ে মুখে বলুন)";
   color: #999;
 }
 .photo-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
@@ -373,51 +373,60 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 95px; wi
 }
 .page-save-indicator { font-size: 12px; color: #555; font-weight: 500; }
 
-/* লাইভ ভাসমান মাইক বাটন */
-.voice-fab {
+/* পেজের ঠিক মাঝে/নিচে সুবিধাজনক স্থানে ভাসমান মাইক ডক */
+.voice-bar-wrapper {
   position: fixed;
-  right: 18px;
-  bottom: 24px;
-  width: 60px;
-  height: 60px;
-  border: none;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #1a73e8, #1557b0);
-  color: white;
-  font-size: 26px;
-  cursor: pointer;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 9998;
-  box-shadow: 0 5px 18px rgba(26,115,232, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
 }
+.voice-fab {
+  width: 62px;
+  height: 62px;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a73e8, #0d47a1);
+  color: white;
+  font-size: 27px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(26,115,232, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+}
+.voice-fab:active { transform: scale(0.94); }
 .voice-fab.recording {
   background: #d93025;
-  box-shadow: 0 0 0 0 rgba(217,48,37,.4);
-  animation: pulseMic 1.3s infinite;
+  box-shadow: 0 0 0 0 rgba(217,48,37,.45);
+  animation: pulseMic 1.2s infinite;
 }
 @keyframes pulseMic {
-  0% { box-shadow: 0 0 0 0 rgba(217,48,37,.5); }
-  70% { box-shadow: 0 0 0 18px rgba(217,48,37,0); }
+  0% { box-shadow: 0 0 0 0 rgba(217,48,37,.6); }
+  70% { box-shadow: 0 0 0 20px rgba(217,48,37,0); }
   100% { box-shadow: 0 0 0 0 rgba(217,48,37,0); }
 }
 
 .toast-msg {
   position: fixed;
-  bottom: 25px;
+  bottom: 95px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(33, 33, 33, 0.94);
   color: white;
-  padding: 10px 20px;
+  padding: 10px 22px;
   border-radius: 25px;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 500;
   box-shadow: 0 4px 15px rgba(0,0,0,0.3);
   z-index: 10000;
   display: none;
+  text-align: center;
+  max-width: 90%;
 }
 #loadingBox { text-align: center; padding: 40px 10px; color: #666; font-size: 15px; }
 
@@ -461,7 +470,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 95px; wi
 <div class="header">
   <h1>📖 অনলাইন ডায়েরি</h1>
   <div class="save-status-bar" id="globalStatus">
-    <span>☁️️ ড্রাইভ ও শিট সংযুক্ত</span>
+    <span>☁ ড্রাইভ ও শিট সংযুক্ত</span>
   </div>
 </div>
 
@@ -538,8 +547,10 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 95px; wi
   <div id="entriesList" style="display:none;"></div>
 </div>
 
-<!-- সরাসরি দ্রুত ভয়েস বাটন -->
-<button type="button" id="voiceFab" class="voice-fab" style="display:none;" title="মুখে কথা বলে লিখুন" onclick="window.toggleDirectVoice()">🎙️</button>
+<!-- পেজের মাঝে/নিচে ভাসমান মাইক বাটন -->
+<div class="voice-bar-wrapper" id="voiceFabWrapper" style="display:none;">
+  <button type="button" id="voiceFab" class="voice-fab" title="মুখে কথা বলে লিখুন" onclick="window.toggleDirectVoice()">🎙️</button>
+</div>
 <div id="toastBox" class="toast-msg"></div>
 
 <!-- API Key Modal -->
@@ -547,7 +558,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 95px; wi
   <div class="custom-modal-card">
     <div class="modal-title" style="color:#6a1b9a;">Gemini API কী সেট করুন</div>
     <div style="font-size: 13px; color: #555; margin-bottom: 8px; line-height: 1.5;">
-      পাতায় লেখা শেষে স্বয়ংক্রিয়ভাবে দাঁড়ি-কমা ও ব্যাকরণ ঠিক করতে আপনার গুগল জেমিনির API Key দিন।
+      মুখে কথা বললে স্বয়ংক্রিয়ভাবে দাঁড়ি-কমা ও ব্যাকরণ ঠিক করতে আপনার গুগল জেমিনির API Key দিন।
     </div>
     <input type="password" id="geminiApiKeyInput" class="modal-input" placeholder="AIzaSy..." />
     <div class="modal-actions">
@@ -985,14 +996,14 @@ window.enterDiaryPage = function(dName) {
   }
   document.getElementById('portalView').style.display = 'none';
   document.getElementById('mainDiaryView').style.display = 'block';
-  document.getElementById('voiceFab').style.display = 'flex';
+  document.getElementById('voiceFabWrapper').style.display = 'flex';
   window.switchDiary(dName);
 };
 
 window.returnToHomePortal = function() {
   if (isDirectRecording) window.stopDirectVoice(true);
   document.getElementById('mainDiaryView').style.display = 'none';
-  document.getElementById('voiceFab').style.display = 'none';
+  document.getElementById('voiceFabWrapper').style.display = 'none';
   document.getElementById('portalView').style.display = 'block';
   window.switchPortalTab(currentPortalTab);
 };
@@ -1207,7 +1218,7 @@ window.confirmCreateDiary = function() {
   window.closeCreateDiaryModal();
   document.getElementById('portalView').style.display = 'none';
   document.getElementById('mainDiaryView').style.display = 'block';
-  document.getElementById('voiceFab').style.display = 'flex';
+  document.getElementById('voiceFabWrapper').style.display = 'flex';
   var loadBox = document.getElementById('loadingBox');
   var list = document.getElementById('entriesList');
   if (loadBox) loadBox.style.display = 'block';
@@ -1650,17 +1661,16 @@ window.refineWithAI = function(btn) {
 };
 
 /* ==========================================================================
-   সুপার ফাস্ট রিয়েল-টাইম ভয়েস-টু-টেক্সট ইঞ্জিন (Instant Native Speech Engine)
+   ক্লিন ভয়েস-টু-টেক্সট ইঞ্জিন + অটোমেটিক জেমিনি এআই পোস্ট-প্রসেসিং
    ========================================================================== */
 var isDirectRecording = false;
 var speechRecognizer = null;
 var browserSupportsSpeech = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 var activeTargetPage = null;
-var basePageText = '';
-var sessionRecognizedText = '';
+var finalSessionTranscript = '';
 var silenceTimer = null;
 
-function initFastSpeechRecognition() {
+function initCleanSpeechRecognition() {
   if (!browserSupportsSpeech) return;
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   try {
@@ -1671,41 +1681,30 @@ function initFastSpeechRecognition() {
     speechRecognizer.maxAlternatives = 1;
 
     speechRecognizer.onstart = function() {
-      setStatus('🔴 শুনছি... মুখে কথা বলুন', 'rgba(217, 48, 37, 0.4)');
+      setStatus('🔴 শুনছি... কথা বলুন', 'rgba(217, 48, 37, 0.4)');
     };
 
     speechRecognizer.onresult = function(event) {
-      var interimStr = '';
-      for (var i = event.resultIndex; i < event.results.length; ++i) {
-        var transcript = event.results[i][0].transcript;
+      var currentFinal = '';
+      var currentInterim = '';
+      
+      // ডুপ্লিকেশন রোধে সম্পূর্ণ রেজাল্ট অ্যারে নতুন করে একত্রীকরণ
+      for (var i = 0; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
-          sessionRecognizedText += (sessionRecognizedText ? ' ' : '') + transcript.trim();
+          currentFinal += event.results[i][0].transcript + ' ';
         } else {
-          interimStr += transcript;
+          currentInterim += event.results[i][0].transcript;
         }
       }
+      
+      finalSessionTranscript = (currentFinal + currentInterim).trim();
 
-      // তাৎক্ষণিক লাইভ লেখা স্ক্রিনে দৃশ্যমান করা
-      if (activeTargetPage) {
-        var contentEl = activeTargetPage.querySelector('.diary-content');
-        if (contentEl) {
-          var currentLive = (sessionRecognizedText + ' ' + interimStr).trim();
-          var merged = basePageText ? (basePageText + '\n\n' + currentLive) : currentLive;
-          contentEl.innerText = merged;
-          
-          var pData = allLoadedPages.find(function(p) { return p.id === activeTargetPage.id; });
-          if (pData) {
-            pData.content = merged;
-          }
-        }
-      }
-
-      // ৪ সেকেন্ড কোনো কথা না বললে অটো-স্টপ হয়ে সেভ হবে
+      // ৪ সেকেন্ড নিরব থাকলে স্বয়ংক্রিয়ভাবে প্রসেস শুরু হবে
       clearTimeout(silenceTimer);
       silenceTimer = setTimeout(function() {
         if (isDirectRecording) {
           window.stopDirectVoice(false);
-          showToast('⏱️ কথা বলা শেষ (স্বয়ংক্রিয়ভাবে সংরক্ষিত)');
+          showToast('⏱️ কথা বলা শেষ (AI প্রসেস হচ্ছে...)');
         }
       }, 4000);
     };
@@ -1719,7 +1718,6 @@ function initFastSpeechRecognition() {
 
     speechRecognizer.onend = function() {
       if (isDirectRecording) {
-        // অপ্রত্যাশিতভাবে সংযোগ বন্ধ হলে নিজে থেকে রিস্টার্ট
         try { speechRecognizer.start(); } catch (err) { resetVoiceButton(); }
       }
     };
@@ -1764,13 +1762,11 @@ window.startDirectVoice = function() {
     return;
   }
   if (!speechRecognizer) {
-    initFastSpeechRecognition();
+    initCleanSpeechRecognition();
   }
 
   activeTargetPage = getLatestTargetPage();
-  var contentEl = activeTargetPage.querySelector('.diary-content');
-  basePageText = contentEl ? contentEl.innerText.trim() : '';
-  sessionRecognizedText = '';
+  finalSessionTranscript = '';
 
   var btn = document.getElementById('voiceFab');
   try {
@@ -1778,7 +1774,7 @@ window.startDirectVoice = function() {
     isDirectRecording = true;
     btn.classList.add('recording');
     btn.innerHTML = '⏹️';
-    setStatus('🔴 রেকর্ড হচ্ছে... কথা বলুন', 'rgba(217, 48, 37, 0.4)');
+    setStatus('🔴 কথা রেকর্ড হচ্ছে... শেষ হলে ⏹️ চাপুন', 'rgba(217, 48, 37, 0.4)');
   } catch (err) {
     try {
       speechRecognizer.stop();
@@ -1787,7 +1783,7 @@ window.startDirectVoice = function() {
         isDirectRecording = true;
         btn.classList.add('recording');
         btn.innerHTML = '⏹️';
-      }, 200);
+      }, 250);
     } catch (e) {
       showToast('⚠️ মাইক্রোফোন শুরু করা যায়নি। অনুমতি যাচাই করুন।');
     }
@@ -1802,18 +1798,54 @@ window.stopDirectVoice = function(isCancel) {
   if (speechRecognizer) {
     try { speechRecognizer.stop(); } catch (e) {}
   }
-
   resetVoiceButton();
 
-  if (!isCancel && activeTargetPage) {
-    var pData = allLoadedPages.find(function(p) { return p.id === activeTargetPage.id; });
-    if (pData) {
-      window.savePageData(pData, false);
-      setStatus('☁️ সংরক্ষিত (' + currentDiary + ')', 'rgba(30, 142, 62, 0.4)');
-      showToast('✅ কথা সরাসরি ডায়েরির পাতায় সংরক্ষিত হয়েছে!');
-    }
+  if (isCancel || !finalSessionTranscript.trim()) {
+    if (!isCancel) showToast('⚠️ কোনো কথা শোনা যায়নি!');
+    return;
+  }
+
+  var textToProcess = finalSessionTranscript.trim();
+  var targetPage = activeTargetPage || getLatestTargetPage();
+  var apiKey = localStorage.getItem('gemini_diary_api_key') || localStorage.getItem('diary_gemini_api_key') || '';
+
+  // যদি Gemini API Key দেওয়া থাকে, তবে AI দিয়ে ডুপ্লিকেট শব্দ বাদ দিয়ে দাঁড়ি-কমা ঠিক হবে
+  if (apiKey && navigator.onLine) {
+    setStatus('🤖 Gemini AI কথা গুছিয়ে নিচ্ছে...', 'rgba(106, 27, 154, 0.4)');
+    google.script.run
+      .withSuccessHandler(function(res) {
+        var finalText = (res && res.success && res.text) ? res.text : textToProcess;
+        appendVoiceTextToPage(finalText, targetPage);
+        setStatus('☁️ সংরক্ষিত (' + currentDiary + ')', 'rgba(30, 142, 62, 0.4)');
+        showToast('✨ Gemini AI কথা পরিপাটি করে পাতায় যুক্ত করেছে!');
+      })
+      .withFailureHandler(function() {
+        appendVoiceTextToPage(textToProcess, targetPage);
+        setStatus('☁️️ সংরক্ষিত (' + currentDiary + ')', 'rgba(30, 142, 62, 0.4)');
+        showToast('⚡ কথা ডায়েরিতে যোগ হয়েছে!');
+      })
+      .processWithGemini(textToProcess, apiKey);
+  } else {
+    appendVoiceTextToPage(textToProcess, targetPage);
+    setStatus('☁️ সংরক্ষিত (' + currentDiary + ')', 'rgba(30, 142, 62, 0.4)');
+    showToast('⚡ কথা ডায়েরিতে যোগ হয়েছে!');
   }
 };
+
+function appendVoiceTextToPage(text, page) {
+  if (!text || !page) return;
+  var contentEl = page.querySelector('.diary-content');
+  if (!contentEl) return;
+  var existing = contentEl.innerText.trim();
+  var merged = existing ? (existing + '\n\n' + String(text).trim()) : String(text).trim();
+  contentEl.innerText = merged;
+  
+  var pData = allLoadedPages.find(function(p) { return p.id === page.id; });
+  if (pData) {
+    pData.content = merged;
+    window.savePageData(pData, false);
+  }
+}
 
 window.handlePrintPdf = function(isFullDiary) {
   var menu = document.getElementById('downloadMenu');
@@ -1917,7 +1949,7 @@ window.exportWord = function(isFullDiary) {
 };
 
 window.onload = function() {
-  initFastSpeechRecognition();
+  initCleanSpeechRecognition();
 
   /* আনলক স্টেট ও পার্সিস্টেন্স যাচাই */
   try {
@@ -1948,4 +1980,3 @@ window.onload = function() {
 </script>
 </body>
 </html>
-
