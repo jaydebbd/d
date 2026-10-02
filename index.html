@@ -473,7 +473,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
 .btn-modal-confirm { background: #1a73e8; color: white; border: none; border-radius: 7px; padding: 8px 16px; font-size: 13.5px; font-weight: 600; cursor: pointer; }
 
 /* ==========================================================================
-   প্রিন্ট ও PDF ফরম্যাটিং (A4 Size, Margin: 0.4 inch)
+   প্রিন্ট ও PDF ফরম্যাটিং (A4 Size, Margin: 0.4 inch, প্যারা স্পেসিং)
    ========================================================================== */
 .print-only-header {
   display: none;
@@ -490,7 +490,6 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
     padding: 0 !important;
     margin: 0 !important;
   }
-  /* অপ্রয়োজনীয় নেভিগেশন ও বাটনগুলো প্রিন্টে লুকানো */
   .header, .portal-container, .diary-bar, .action-bar, .active-date-banner,
   .page-footer, .voice-bar-wrapper, .toast-msg, .custom-modal-overlay, #loadingBox {
     display: none !important;
@@ -501,13 +500,12 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
     max-width: 100% !important;
     width: 100% !important;
   }
-  /* প্রিন্টের জন্য পরিচ্ছন্ন কাস্টম হেডার */
   .print-only-header {
     display: block !important;
     text-align: center;
     border-bottom: 2px solid #8c7355;
     padding-bottom: 6px;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
   }
   .print-only-header h2 {
     font-size: 19px;
@@ -518,7 +516,6 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
     font-size: 12.5px;
     color: #555;
   }
-  /* ডায়েরির পাতার প্রিন্ট লুক */
   .diary-page {
     background: #fff !important;
     box-shadow: none !important;
@@ -526,10 +523,15 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
     page-break-after: always;
     break-after: page;
     margin-bottom: 14px !important;
-    padding: 14px !important;
+    padding: 16px 18px !important;
   }
   .diary-page::before {
     display: none !important;
+  }
+  .page-header {
+    margin-bottom: 16px !important;
+    padding-bottom: 8px !important;
+    border-bottom: 1.5px solid #8c7355 !important;
   }
   .page-number-badge {
     background: transparent !important;
@@ -544,6 +546,8 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
     border-bottom: none !important;
     font-size: 15px !important;
     line-height: 1.8 !important;
+    white-space: pre-wrap !important;
+    margin-top: 14px !important;
   }
   .photo-del {
     display: none !important;
@@ -595,7 +599,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
 <!-- মূল ডায়েরি ভিউ -->
 <div class="container" id="mainDiaryView" style="display:none;">
 
-  <!-- প্রিন্ট হেডার (শুধু প্রিন্ট করার সময় দেখা যাবে) -->
+  <!-- প্রিন্ট হেডার -->
   <div class="print-only-header" id="printOnlyHeader">
     <h2 id="printHeaderTitle">📔 ডায়েরি</h2>
     <p id="printHeaderSubtitle">তারিখ ও সময়</p>
@@ -664,7 +668,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
   <div class="custom-modal-card">
     <div class="modal-title" style="color:#6a1b9a;">🤖 Gemini API কী সেট করুন</div>
     <div style="font-size: 13px; color: #555; margin-bottom: 8px; line-height: 1.5;">
-      ভয়েস-টু-টেক্সট নিখুঁত করতে এবং ব্যাকরণ/দাঁড়ি-কমা ঠিক করতে আপনার গুগল জেমিনির API Key দিন[span_0](start_span)[span_0](end_span)।
+      ভয়েস-টু-টেক্সট নিখুঁত করতে এবং ব্যাকরণ/দাঁড়ি-কমা ঠিক করতে আপনার গুগল জেমিনির API Key দিন[span_3](start_span)[span_3](end_span)।
     </div>
     <input type="password" id="geminiApiKeyInput" class="modal-input" placeholder="Gemini API Key (AIzaSy...)" />
     <div class="modal-actions">
@@ -764,7 +768,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
 
 <script src="config.js"></script>
 <script>
-/* JB-Diary GitHub Frontend → Apps Script JSONP Bridge[span_1](start_span)[span_1](end_span) */
+/* JB-Diary GitHub Frontend → Apps Script JSONP Bridge[span_4](start_span)[span_4](end_span) */
 (function () {
   'use strict';
   window.JB_DIARY_API_URL = window.JB_DIARY_API_URL || 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_EXEC_URL_HERE';
@@ -1009,7 +1013,7 @@ document.addEventListener("visibilitychange", function() {
   }
 });
 
-/* অফলাইন স্টোরেজ ও পেন্ডিং কিউ লজিক[span_2](start_span)[span_2](end_span) */
+/* অফলাইন স্টোরেজ ও পেন্ডিং কিউ লজিক[span_5](start_span)[span_5](end_span) */
 function getStorageKey(diary) {
   return "offline_diary_pages_" + (diary || currentDiary);
 }
@@ -1069,7 +1073,7 @@ function syncPendingQueue() {
     if (currentQueue.length === 0) {
       isSyncingPending = false;
       setStatus('☁️ ড্রাইভ ও শিট সংযুক্ত', 'rgba(30, 142, 62, 0.4)');
-      showToast('☁️️ অফলাইনের সব লেখা অনলাইনে সংরক্ষিত হয়েছে!');
+      showToast('☁️ অফলাইনের সব লেখা অনলাইনে সংরক্ষিত হয়েছে!');
       return;
     }
     var item = currentQueue[0];
@@ -1178,7 +1182,7 @@ function showToast(msg) {
   }
 }
 
-/* পোর্টাল ইন্টারফেস লজিক[span_3](start_span)[span_3](end_span) */
+/* পোর্টাল ইন্টারফেস লজিক[span_6](start_span)[span_6](end_span) */
 window.switchPortalTab = function(type) {
   checkInactivityTimeout();
   if (type === "personal" && !isPersonalUnlocked) {
@@ -1500,7 +1504,7 @@ window.closeCreateDiaryModal = function() {
 window.confirmCreateDiary = function() {
   var nameInput = document.getElementById('newDiaryNameInput');
   var name = nameInput.value.trim();
-  if (!name) { showToast("⚠️ অনুগ্রহ করে ডায়েরির নাম লিখুন!"); return; }
+  if (!name) { showToast("⚠️️ অনুগ্রহ করে ডায়েরির নাম লিখুন!"); return; }
   var radios = document.getElementsByName('diaryCategoryRadio');
   var cat = "general";
   for (var i = 0; i < radios.length; i++) {
@@ -1988,7 +1992,7 @@ window.refineWithAI = async function(btn) {
     return;
   }
   if (!text) {
-    showToast('⚠️️ আগে পাতায় কিছু লিখুন!');
+    showToast('⚠️ আগে পাতায় কিছু লিখুন!');
     return;
   }
 
@@ -2021,7 +2025,7 @@ window.refineWithAI = async function(btn) {
 };
 
 /* ==========================================================================
-   স্মার্ট ভয়েস-টু-টেক্সট ইঞ্জিন (voice.html-এর ডুয়াল ট্রান্সক্রিপশন লজিক)
+   স্মার্ট ভয়েস-টু-টেক্সট ইঞ্জিন
    ========================================================================== */
 var isDirectRecording = false;
 var isDirectProcessing = false;
@@ -2338,7 +2342,6 @@ async function processVoiceDataAndAppend() {
   var finalDeliveredText = '';
   var apiKey = getStoredGeminiKey();
 
-  // ১. জেমিনি অডিও ট্রান্সক্রিপ্ট
   if (apiKey && audioBlob.size > 0 && navigator.onLine) {
     try {
       setStatus('🤖 Gemini AI ট্রান্সক্রিপ্ট ও দাঁড়ি-কমা ঠিক করছে...', 'rgba(106, 27, 154, 0.4)');
@@ -2351,12 +2354,10 @@ async function processVoiceDataAndAppend() {
     }
   }
 
-  // ২. ফলব্যাক: ব্রাউজার টেক্সট
   if (!finalDeliveredText) {
     finalDeliveredText = browserFallbackText;
   }
 
-  // ৩. ডাইরেক্ট ব্রাউজার থেকে Gemini দিয়ে টেক্সট পরিপাটি ও শুদ্ধ করা
   if (finalDeliveredText && apiKey && navigator.onLine) {
     try {
       setStatus('✨ Gemini দিয়ে পরিপাটি অনুচ্ছেদ সাজানো হচ্ছে...', 'rgba(106, 27, 154, 0.4)');
@@ -2444,22 +2445,40 @@ window.handlePrintPdf = function(isFullDiary) {
   }
 };
 
+/* ==========================================================================
+   Word (.doc) এক্সপোর্ট — প্যারাগ্রাফ গ্যাপ ও এন্টার হ্যান্ডলিং
+   ========================================================================== */
+function formatContentToWordParagraphs(content) {
+  if (!content) return '<p style="font-size: 14.5px; color: #777; margin: 0 0 12px 0;">(পাতাটি ফাঁকা)</p>';
+  var paras = String(content).split(/\r?\n+/);
+  var html = '';
+  for (var i = 0; i < paras.length; i++) {
+    var line = paras[i].trim();
+    if (line) {
+      html += '<p style="font-size: 15px; color: #2c3e50; line-height: 1.8; margin: 0 0 14px 0; text-align: justify;">' + line + '</p>';
+    }
+  }
+  return html || '<p style="font-size: 14.5px; color: #777; margin: 0 0 12px 0;">(পাতাটি ফাঁকা)</p>';
+}
+
 window.exportWord = function(isFullDiary) {
   var menu = document.getElementById('downloadMenu');
   if (menu) menu.style.display = 'none';
   var wordHtml = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">';
   wordHtml += '<head><meta charset="utf-8"><title>' + currentDiary + '</title>';
   wordHtml += '<style>';
-  wordHtml += '@page Section1 { size: 210mm 297mm; margin: 0.4in; }';
+  wordHtml += '@page Section1 { size: 210mm 297mm; margin: 0.4in; mso-page-orientation: portrait; }';
   wordHtml += 'div.Section1 { page: Section1; }';
-  wordHtml += 'body { font-family: Arial, sans-serif; margin: 0; padding: 0.4in; }';
+  wordHtml += 'body { font-family: "Segoe UI", Arial, sans-serif; margin: 0; padding: 0.4in; background-color: #ffffff; }';
+  wordHtml += 'p { margin: 0 0 14px 0; }';
   wordHtml += '</style></head>';
   wordHtml += '<body><div class="Section1">';
   var downloadFileName = "";
+
   if (!isFullDiary) {
     var formattedSlash = formatDateKeyToSlashBn(currentActiveDateKey);
     downloadFileName = currentDiary + '_' + currentActiveDateKey + '.doc';
-    wordHtml += '<h1 style="color: #1a73e8; text-align: center; border-bottom: 2px solid #8c7355; padding-bottom: 10px; margin-top: 0;">📔 ' + currentDiary + ' : ' + formattedSlash + '</h1>';
+    wordHtml += '<h1 style="color: #1a73e8; text-align: center; border-bottom: 2px solid #8c7355; padding-bottom: 10px; margin-top: 0; margin-bottom: 20px; font-size: 20px;">📔 ' + currentDiary + ' : ' + formattedSlash + '</h1>';
     var pages = document.querySelectorAll('.diary-page');
     for (var i = 0; i < pages.length; i++) {
       var page = pages[i];
@@ -2467,16 +2486,22 @@ window.exportWord = function(isFullDiary) {
       var pageBadge = page.querySelector('.page-number-badge') ? page.querySelector('.page-number-badge').innerText : '';
       var content = page.querySelector('.diary-content') ? page.querySelector('.diary-content').innerText : '';
       var imgs = page.querySelectorAll('.photo-item img');
-      wordHtml += '<div style="margin-top: 15px; border: 2px solid #8c7355; border-radius: 8px; padding: 18px; page-break-after: always; min-height: 800px;">';
-      wordHtml += '<div style="display: flex; justify-content: space-between; border-bottom: 1px solid #ccc; padding-bottom: 8px; margin-bottom: 12px;">';
-      wordHtml += '  <strong style="color: #1a73e8; font-size: 14px;">' + timestamp + '</strong>';
-      wordHtml += '  <span style="color: #666; font-size: 13px; font-weight: bold; float: right;">[' + pageBadge + ']</span>';
+
+      wordHtml += '<div style="margin-top: 15px; border: 2px solid #8c7355; border-radius: 8px; padding: 18px 20px; page-break-after: always; min-height: 800px; background-color: #fffdf9;">';
+      wordHtml += '<div style="border-bottom: 1.5px solid #8c7355; padding-bottom: 8px; margin-bottom: 18px;">';
+      wordHtml += '  <table style="width: 100%; border: none; border-collapse: collapse;"><tr>';
+      wordHtml += '    <td style="text-align: left;"><strong style="color: #1a73e8; font-size: 14px;">' + timestamp + '</strong></td>';
+      wordHtml += '    <td style="text-align: right;"><span style="color: #555; font-size: 13px; font-weight: bold; border: 1px solid #8c7355; padding: 3px 8px; border-radius: 4px;">' + pageBadge + '</span></td>';
+      wordHtml += '  </tr></table>';
       wordHtml += '</div>';
-      wordHtml += '<p style="white-space: pre-wrap; font-size: 15px; color: #333; line-height: 1.6;">' + content + '</p>';
+      wordHtml += '<div style="padding-top: 8px;">';
+      wordHtml += formatContentToWordParagraphs(content);
+      wordHtml += '</div>';
+
       if (imgs.length > 0) {
-        wordHtml += '<div style="margin-top: 14px;">';
+        wordHtml += '<div style="margin-top: 18px; border-top: 1px dashed #ccc; padding-top: 10px;">';
         for (var j = 0; j < imgs.length; j++) {
-          wordHtml += '  <img src="' + imgs[j].src + '" style="max-width: 360px; display: block; margin: 10px 0; border-radius: 6px;" />';
+          wordHtml += '  <img src="' + imgs[j].src + '" style="max-width: 360px; display: block; margin: 10px 0; border-radius: 6px; border: 1px solid #ddd;" />';
         }
         wordHtml += '</div>';
       }
@@ -2484,7 +2509,7 @@ window.exportWord = function(isFullDiary) {
     }
   } else {
     downloadFileName = currentDiary + '_সম্পূর্ণ_ডায়েরি.doc';
-    wordHtml += '<h1 style="color: #1a73e8; text-align: center; border-bottom: 2px solid #8c7355; padding-bottom: 12px; margin-top: 0;">📔 ' + currentDiary + ' (সম্পূর্ণ ডায়েরি)</h1>';
+    wordHtml += '<h1 style="color: #1a73e8; text-align: center; border-bottom: 2px solid #8c7355; padding-bottom: 12px; margin-top: 0; margin-bottom: 22px; font-size: 22px;">📔 ' + currentDiary + ' (সম্পূর্ণ ডায়েরি)</h1>';
     var dates = [];
     for (var i = 0; i < allLoadedPages.length; i++) {
       var d = allLoadedPages[i].dateKey || window.todayDateKey;
@@ -2496,16 +2521,21 @@ window.exportWord = function(isFullDiary) {
       var dayPages = allLoadedPages.filter(function(p) { return (p.dateKey || window.todayDateKey) === curD; });
       for (var pIdx = 0; pIdx < dayPages.length; pIdx++) {
         var pg = dayPages[pIdx];
-        wordHtml += '<div style="margin-top: 15px; border: 2px solid #8c7355; border-radius: 8px; padding: 18px; page-break-after: always; min-height: 800px;">';
-        wordHtml += '<div style="display: flex; justify-content: space-between; border-bottom: 1px solid #ccc; padding-bottom: 8px; margin-bottom: 12px;">';
-        wordHtml += '  <strong style="color: #1a73e8; font-size: 14px;">' + (pg.timestamp || '') + '</strong>';
-        wordHtml += '  <span style="color: #666; font-size: 13px; font-weight: bold; float: right;">[' + (pg.pageNum || '') + ']</span>';
+        wordHtml += '<div style="margin-top: 15px; border: 2px solid #8c7355; border-radius: 8px; padding: 18px 20px; page-break-after: always; min-height: 800px; background-color: #fffdf9;">';
+        wordHtml += '<div style="border-bottom: 1.5px solid #8c7355; padding-bottom: 8px; margin-bottom: 18px;">';
+        wordHtml += '  <table style="width: 100%; border: none; border-collapse: collapse;"><tr>';
+        wordHtml += '    <td style="text-align: left;"><strong style="color: #1a73e8; font-size: 14px;">' + (pg.timestamp || '') + '</strong></td>';
+        wordHtml += '    <td style="text-align: right;"><span style="color: #555; font-size: 13px; font-weight: bold; border: 1px solid #8c7355; padding: 3px 8px; border-radius: 4px;">' + (pg.pageNum || '') + '</span></td>';
+        wordHtml += '  </tr></table>';
         wordHtml += '</div>';
-        wordHtml += '<p style="white-space: pre-wrap; font-size: 15px; color: #333; line-height: 1.6;">' + (pg.content || '') + '</p>';
+        wordHtml += '<div style="padding-top: 8px;">';
+        wordHtml += formatContentToWordParagraphs(pg.content);
+        wordHtml += '</div>';
         wordHtml += '</div>';
       }
     }
   }
+
   wordHtml += '</div></body></html>';
   var blob = new Blob(['\ufeff' + wordHtml], { type: 'application/msword' });
   var a = document.createElement('a');
@@ -2518,10 +2548,8 @@ window.exportWord = function(isFullDiary) {
 
 window.onload = function() {
   checkGateLock();
-
   initCleanSpeechRecognition();
 
-  /* আনলক স্টেট ও পার্সিস্টেন্স যাচাই[span_4](start_span)[span_4](end_span) */
   try {
     var unl = localStorage.getItem("diary_personal_unlocked") === "true";
     var lastTime = parseInt(localStorage.getItem("diary_last_active_time") || "0", 10);
@@ -2563,3 +2591,5 @@ window.onload = function() {
 </script>
 </body>
 </html>
+
+
