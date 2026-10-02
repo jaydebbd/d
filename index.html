@@ -473,7 +473,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
 .btn-modal-confirm { background: #1a73e8; color: white; border: none; border-radius: 7px; padding: 8px 16px; font-size: 13.5px; font-weight: 600; cursor: pointer; }
 
 /* ==========================================================================
-   প্রিন্ট ও PDF ফরম্যাটিং (অপ্রয়োজনীয় অংশ লুকিয়ে কেবল ডায়েরির পাতা প্রিন্ট করা)
+   প্রিন্ট ও PDF ফরম্যাটিং (A4 Size, Margin: 0.4 inch)
    ========================================================================== */
 .print-only-header {
   display: none;
@@ -482,7 +482,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
 @media print {
   @page {
     size: A4 portrait;
-    margin: 15mm 15mm;
+    margin: 0.4in;
   }
   body {
     background: #fff !important;
@@ -506,16 +506,16 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
     display: block !important;
     text-align: center;
     border-bottom: 2px solid #8c7355;
-    padding-bottom: 8px;
-    margin-bottom: 16px;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
   }
   .print-only-header h2 {
-    font-size: 20px;
+    font-size: 19px;
     color: #1a73e8;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
   }
   .print-only-header p {
-    font-size: 13px;
+    font-size: 12.5px;
     color: #555;
   }
   /* ডায়েরির পাতার প্রিন্ট লুক */
@@ -525,8 +525,8 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
     border: 1.5px solid #8c7355 !important;
     page-break-after: always;
     break-after: page;
-    margin-bottom: 20px !important;
-    padding: 16px !important;
+    margin-bottom: 14px !important;
+    padding: 14px !important;
   }
   .diary-page::before {
     display: none !important;
@@ -664,7 +664,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
   <div class="custom-modal-card">
     <div class="modal-title" style="color:#6a1b9a;">🤖 Gemini API কী সেট করুন</div>
     <div style="font-size: 13px; color: #555; margin-bottom: 8px; line-height: 1.5;">
-      ভয়েস-টু-টেক্সট নিখুঁত করতে এবং ব্যাকরণ/দাঁড়ি-কমা ঠিক করতে আপনার গুগল জেমিনির API Key দিন[span_4](start_span)[span_4](end_span)।
+      ভয়েস-টু-টেক্সট নিখুঁত করতে এবং ব্যাকরণ/দাঁড়ি-কমা ঠিক করতে আপনার গুগল জেমিনির API Key দিন[span_0](start_span)[span_0](end_span)।
     </div>
     <input type="password" id="geminiApiKeyInput" class="modal-input" placeholder="Gemini API Key (AIzaSy...)" />
     <div class="modal-actions">
@@ -764,7 +764,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
 
 <script src="config.js"></script>
 <script>
-/* JB-Diary GitHub Frontend → Apps Script JSONP Bridge[span_5](start_span)[span_5](end_span) */
+/* JB-Diary GitHub Frontend → Apps Script JSONP Bridge[span_1](start_span)[span_1](end_span) */
 (function () {
   'use strict';
   window.JB_DIARY_API_URL = window.JB_DIARY_API_URL || 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_EXEC_URL_HERE';
@@ -1009,7 +1009,7 @@ document.addEventListener("visibilitychange", function() {
   }
 });
 
-/* অফলাইন স্টোরেজ ও পেন্ডিং কিউ লজিক[span_6](start_span)[span_6](end_span) */
+/* অফলাইন স্টোরেজ ও পেন্ডিং কিউ লজিক[span_2](start_span)[span_2](end_span) */
 function getStorageKey(diary) {
   return "offline_diary_pages_" + (diary || currentDiary);
 }
@@ -1069,7 +1069,7 @@ function syncPendingQueue() {
     if (currentQueue.length === 0) {
       isSyncingPending = false;
       setStatus('☁️ ড্রাইভ ও শিট সংযুক্ত', 'rgba(30, 142, 62, 0.4)');
-      showToast('☁️ অফলাইনের সব লেখা অনলাইনে সংরক্ষিত হয়েছে!');
+      showToast('☁️️ অফলাইনের সব লেখা অনলাইনে সংরক্ষিত হয়েছে!');
       return;
     }
     var item = currentQueue[0];
@@ -1178,7 +1178,7 @@ function showToast(msg) {
   }
 }
 
-/* পোর্টাল ইন্টারফেস লজিক[span_7](start_span)[span_7](end_span) */
+/* পোর্টাল ইন্টারফেস লজিক[span_3](start_span)[span_3](end_span) */
 window.switchPortalTab = function(type) {
   checkInactivityTimeout();
   if (type === "personal" && !isPersonalUnlocked) {
@@ -1988,7 +1988,7 @@ window.refineWithAI = async function(btn) {
     return;
   }
   if (!text) {
-    showToast('⚠️ আগে পাতায় কিছু লিখুন!');
+    showToast('⚠️️ আগে পাতায় কিছু লিখুন!');
     return;
   }
 
@@ -2237,7 +2237,7 @@ window.startDirectVoice = function() {
         isDirectRecording = true;
         btn.classList.add('recording');
         btn.innerHTML = '⏹️';
-        setStatus('🔴 শুনছি... কথা শেষ হলে ৪ সেকেন্ড থামুন বা ⏹️ চাপুন', 'rgba(217, 48, 37, 0.4)');
+        setStatus('🔴 শুনছি... কথা শেষ হলে ৪ সেকেন্ড থামুন বা ⏹ চাপুন', 'rgba(217, 48, 37, 0.4)');
       } catch (err) {
         showToast('❌ মাইক্রোফোন চালু করা যায়নি');
       }
@@ -2403,7 +2403,7 @@ function pushCleanTextToPage(text) {
 }
 
 /* ==========================================================================
-   প্রিন্ট ও PDF লজিক (শুধুমাত্র ডায়েরির পাতা ও শিরোনাম প্রিন্ট হওয়া)
+   প্রিন্ট ও PDF লজিক (A4 Size, Margin: 0.4 inch)
    ========================================================================== */
 window.handlePrintPdf = function(isFullDiary) {
   var menu = document.getElementById('downloadMenu');
@@ -2414,12 +2414,10 @@ window.handlePrintPdf = function(isFullDiary) {
   var list = document.getElementById('entriesList');
 
   if (!isFullDiary) {
-    // আজকের বা নির্বাচিত দিনের পৃষ্ঠা প্রিন্ট
     if (printTitle) printTitle.innerText = '📔 ' + currentDiary;
     if (printSub) printSub.innerText = formatDateKeyToSlashBn(currentActiveDateKey);
     window.print();
   } else {
-    // সম্পূর্ণ ডায়েরির সব পৃষ্ঠা প্রিন্ট
     if (printTitle) printTitle.innerText = '📔 ' + currentDiary + ' (সম্পূর্ণ ডায়েরি)';
     if (printSub) printSub.innerText = 'সর্বমোট পাতা সংখ্যা: ' + toBn(allLoadedPages.length);
 
@@ -2439,7 +2437,6 @@ window.handlePrintPdf = function(isFullDiary) {
       }
     }
     window.print();
-    // প্রিন্ট ডায়ালগ বন্ধ হলে আগের ভিউ ফিরিয়ে আনা
     setTimeout(function() {
       list.innerHTML = originalHtml;
       renderCurrentDatePages();
@@ -2453,9 +2450,9 @@ window.exportWord = function(isFullDiary) {
   var wordHtml = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">';
   wordHtml += '<head><meta charset="utf-8"><title>' + currentDiary + '</title>';
   wordHtml += '<style>';
-  wordHtml += '@page Section1 { size: 210mm 297mm; margin: 0.5in; }';
+  wordHtml += '@page Section1 { size: 210mm 297mm; margin: 0.4in; }';
   wordHtml += 'div.Section1 { page: Section1; }';
-  wordHtml += 'body { font-family: Arial, sans-serif; margin: 0; padding: 0.5in; }';
+  wordHtml += 'body { font-family: Arial, sans-serif; margin: 0; padding: 0.4in; }';
   wordHtml += '</style></head>';
   wordHtml += '<body><div class="Section1">';
   var downloadFileName = "";
@@ -2520,12 +2517,11 @@ window.exportWord = function(isFullDiary) {
 };
 
 window.onload = function() {
-  // সাইটের সার্বজনীন ওপেনিং গেট লক পরীক্ষা
   checkGateLock();
 
   initCleanSpeechRecognition();
 
-  /* আনলক স্টেট ও পার্সিস্টেন্স যাচাই[span_8](start_span)[span_8](end_span) */
+  /* আনলক স্টেট ও পার্সিস্টেন্স যাচাই[span_4](start_span)[span_4](end_span) */
   try {
     var unl = localStorage.getItem("diary_personal_unlocked") === "true";
     var lastTime = parseInt(localStorage.getItem("diary_last_active_time") || "0", 10);
