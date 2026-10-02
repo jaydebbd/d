@@ -441,11 +441,11 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
 .custom-modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.65);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 99999;
   padding: 16px;
 }
 .custom-modal-card {
@@ -474,6 +474,18 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
 </style>
 </head>
 <body>
+
+<!-- ২৪ ঘণ্টার প্রারম্ভিক সাইট লক (Opening Gate Lock) -->
+<div id="gateLockOverlay" class="custom-modal-overlay" style="display:none; background: #0d47a1;">
+  <div class="custom-modal-card" style="box-shadow: 0 15px 35px rgba(0,0,0,0.4); text-align: center;">
+    <div style="font-size: 44px; margin-bottom: 8px;">🔐</div>
+    <div class="modal-title" style="font-size: 18px; margin-bottom: 6px;">আমার অনলাইন ডায়েরি</div>
+    <div style="font-size: 13px; color: #666; margin-bottom: 16px;">ডায়েরিতে প্রবেশের জন্য ওপেনিং পাসওয়ার্ড দিন:</div>
+    <input type="password" id="gatePassInput" class="modal-input" placeholder="পাসওয়ার্ড লিখুন..." style="text-align: center; font-size: 18px; letter-spacing: 2px;" />
+    <button type="button" class="btn-modal-confirm" style="width: 100%; padding: 11px; font-size: 15px;" onclick="window.verifyGatePassword()">প্রবেশ করুন</button>
+  </div>
+</div>
+
 <div class="header">
   <h1>📖 অনলাইন ডায়েরি</h1>
   <div class="save-status-bar" id="globalStatus">
@@ -538,9 +550,11 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
         <button type="button" class="dropdown-item" style="color:#6a1b9a; font-weight:600;" onclick="window.showApiKeyModal()">Gemini API কী সেট করুন</button>
         <a id="folderLinkItem" href="#" target="_blank" class="dropdown-item" style="display:none;">📁 ডায়েরি ফোল্ডার দেখুন</a>
         <a id="sheetLinkItem" href="#" target="_blank" class="dropdown-item" style="display:none;">📊 গুগল শিট ডাটাবেস</a>
-        <button type="button" class="dropdown-item" id="btnChangePinItem" style="display:none;" onclick="window.showChangePinModal()">পাসওয়ার্ড পরিবর্তন</button>
+        <button type="button" class="dropdown-item" id="btnChangePinItem" style="display:none;" onclick="window.showChangePinModal()">ব্যক্তিগত পিন পরিবর্তন</button>
+        <button type="button" class="dropdown-item" id="btnChangeGatePassItem" style="display:none;" onclick="window.showChangeGatePassModal()">🔑 ওপেনিং পাসওয়ার্ড পরিবর্তন</button>
+        <button type="button" class="dropdown-item item-delete" id="btnDeleteDiaryCompletelyItem" style="display:none;" onclick="window.showDeleteDiaryModal()">🗑️ এই ডায়েরিটি সম্পূর্ণ মুছুন</button>
         <button type="button" class="dropdown-item item-lock" id="btnDropLockItem" style="display:none;" onclick="window.lockPersonalDiaries()">ডায়েরি লক করুন</button>
-        <button type="button" class="dropdown-item item-delete" onclick="window.handleDeleteLastPage()">🗑️ শেষ পৃষ্ঠা মুছুন</button>
+        <button type="button" class="dropdown-item item-delete" onclick="window.handleDeleteLastPage()">📄 শেষ পৃষ্ঠা মুছুন</button>
       </div>
     </div>
   </div>
@@ -565,7 +579,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
   <div class="custom-modal-card">
     <div class="modal-title" style="color:#6a1b9a;">🤖 Gemini API কী সেট করুন</div>
     <div style="font-size: 13px; color: #555; margin-bottom: 8px; line-height: 1.5;">
-      ভয়েস-টু-টেক্সট নিখুঁত করতে এবং ব্যাকরণ/দাঁড়ি-কমা ঠিক করতে আপনার গুগল জেমিনির API Key দিন।
+      ভয়েস-টু-টেক্সট নিখুঁত করতে এবং ব্যাকরণ/দাঁড়ি-কমা ঠিক করতে আপনার গুগল জেমিনির API Key দিন[span_14](start_span)[span_14](end_span)[span_15](start_span)[span_15](end_span)।
     </div>
     <input type="password" id="geminiApiKeyInput" class="modal-input" placeholder="Gemini API Key (AIzaSy...)" />
     <div class="modal-actions">
@@ -605,7 +619,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
   </div>
 </div>
 
-<!-- Pin Modal -->
+<!-- Pin Modal (Personal Unlock) -->
 <div id="pinModalOverlay" class="custom-modal-overlay" style="display:none;">
   <div class="custom-modal-card">
     <div class="modal-title">🔒 পাসওয়ার্ড প্রয়োজন</div>
@@ -618,10 +632,10 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
   </div>
 </div>
 
-<!-- Change Pin Modal -->
+<!-- Change Personal Pin Modal -->
 <div id="changePinModalOverlay" class="custom-modal-overlay" style="display:none;">
   <div class="custom-modal-card">
-    <div class="modal-title">🔑 পাসওয়ার্ড পরিবর্তন</div>
+    <div class="modal-title">🔑 ব্যক্তিগত পিন পরিবর্তন</div>
     <label style="font-size: 13.5px; font-weight: 600; color: #444; display:block; margin-bottom: 4px;">বর্তমান পাসওয়ার্ড:</label>
     <input type="password" id="oldPinInput" class="modal-input" placeholder="বর্তমান পাসওয়ার্ড লিখুন" />
     <label style="font-size: 13.5px; font-weight: 600; color: #444; display:block; margin-bottom: 4px;">নতুন পাসওয়ার্ড (কমপক্ষে ৪ সংখ্যা):</label>
@@ -633,9 +647,39 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
   </div>
 </div>
 
+<!-- Change Gate Opening Password Modal -->
+<div id="changeGateModalOverlay" class="custom-modal-overlay" style="display:none;">
+  <div class="custom-modal-card">
+    <div class="modal-title">🔑 ওপেনিং পাসওয়ার্ড পরিবর্তন</div>
+    <div style="font-size: 12.5px; color: #555; margin-bottom: 8px;">সাইটে ঢোকার সময় যে পাসওয়ার্ডটি চাইবে সেটি পরিবর্তন করুন:</div>
+    <label style="font-size: 13px; font-weight: 600; color: #444;">বর্তমান ওপেনিং পাসওয়ার্ড:</label>
+    <input type="password" id="oldGatePassInput" class="modal-input" placeholder="বর্তমান পাসওয়ার্ড" />
+    <label style="font-size: 13px; font-weight: 600; color: #444;">নতুন ওপেনিং পাসওয়ার্ড:</label>
+    <input type="password" id="newGatePassInput" class="modal-input" placeholder="নতুন পাসওয়ার্ড দিন" />
+    <div class="modal-actions">
+      <button type="button" class="btn-modal-cancel" onclick="window.closeChangeGateModal()">বাতিল</button>
+      <button type="button" class="btn-modal-confirm" onclick="window.confirmChangeGatePass()">পরিবর্তন করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Diary Confirmation Modal -->
+<div id="deleteDiaryModalOverlay" class="custom-modal-overlay" style="display:none;">
+  <div class="custom-modal-card">
+    <div class="modal-title" style="color: #d93025;">🗑️ ডায়েরি সম্পূর্ণ মুছে ফেলবেন?</div>
+    <div style="font-size: 13.5px; color: #444; margin-bottom: 12px; line-height: 1.5;">
+      আপনি কি নিশ্চিত যে <b id="delTargetDiaryName" style="color: #d93025;"></b> ডায়েরিটি এবং গুগল ড্রাইভের এর সকল শিট ও ফাইল চিরতরে মুছে ফেলতে চান? এটি আর ফিরিয়ে আনা যাবে না!
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn-modal-cancel" onclick="window.closeDeleteDiaryModal()">বাতিল</button>
+      <button type="button" class="btn-modal-confirm" style="background: #d93025;" onclick="window.confirmDeleteDiaryCompletely()">হ্যাঁ, মুছে ফেলুন</button>
+    </div>
+  </div>
+</div>
+
 <script src="config.js"></script>
 <script>
-/* JB-Diary GitHub Frontend → Apps Script JSONP Bridge */
+/* JB-Diary GitHub Frontend → Apps Script JSONP Bridge[span_16](start_span)[span_16](end_span) */
 (function () {
   'use strict';
   window.JB_DIARY_API_URL = window.JB_DIARY_API_URL || 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_EXEC_URL_HERE';
@@ -706,6 +750,8 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
               apiCall(prop, { diaryName: args[0], pageData: args[1] }, successHandler, failureHandler);
             } else if (prop === 'deletePageFromSheet') {
               apiCall(prop, { diaryName: args[0], pageId: args[1], dateKey: args[2] }, successHandler, failureHandler);
+            } else if (prop === 'deleteDiaryCompletely') {
+              apiCall(prop, { diaryName: args[0] }, successHandler, failureHandler);
             } else if (prop === 'verifyPersonalPin') {
               apiCall(prop, { inputPin: args[0] }, successHandler, failureHandler);
             } else if (prop === 'changePersonalPin') {
@@ -750,7 +796,69 @@ var currentActiveDateKey = "";
 var saveTimers = {};
 var isSyncingPending = false;
 
-/* অটো-লক (২০ মিনিট নিষ্ক্রিয় থাকলে) এবং স্থায়ী আনলক স্টেট */
+/* ==========================================================================
+   ২৪ ঘণ্টার প্রারম্ভিক সাইট লক ব্যবস্থাপনা (Opening Gate Lock)
+   ========================================================================== */
+var GATE_LOCK_HOURS_MS = 24 * 60 * 60 * 1000;
+
+function checkGateLock() {
+  var gateAuthTime = parseInt(localStorage.getItem("gate_auth_time") || "0", 10);
+  var now = Date.now();
+  if (!gateAuthTime || (now - gateAuthTime > GATE_LOCK_HOURS_MS)) {
+    document.getElementById('gateLockOverlay').style.display = 'flex';
+    document.getElementById('gatePassInput').value = '';
+    document.getElementById('gatePassInput').focus();
+    return false;
+  }
+  document.getElementById('gateLockOverlay').style.display = 'none';
+  return true;
+}
+
+window.verifyGatePassword = function() {
+  var entered = document.getElementById('gatePassInput').value.trim();
+  var savedGatePass = localStorage.getItem("diary_gate_password") || "1234";
+  if (entered === savedGatePass) {
+    localStorage.setItem("gate_auth_time", String(Date.now()));
+    document.getElementById('gateLockOverlay').style.display = 'none';
+    showToast("🔓 স্বাগতম! ডায়েরি উন্মুক্ত হয়েছে।");
+  } else {
+    showToast("❌ ভুল ওপেনিং পাসওয়ার্ড!");
+  }
+};
+
+window.showChangeGatePassModal = function() {
+  var downMenu = document.getElementById('downloadMenu');
+  if (downMenu) downMenu.style.display = 'none';
+  document.getElementById('changeGateModalOverlay').style.display = 'flex';
+  document.getElementById('oldGatePassInput').value = '';
+  document.getElementById('newGatePassInput').value = '';
+};
+
+window.closeChangeGateModal = function() {
+  document.getElementById('changeGateModalOverlay').style.display = 'none';
+};
+
+window.confirmChangeGatePass = function() {
+  var oldP = document.getElementById('oldGatePassInput').value.trim();
+  var newP = document.getElementById('newGatePassInput').value.trim();
+  var currentP = localStorage.getItem("diary_gate_password") || "1234";
+  if (oldP !== currentP) {
+    showToast("❌ বর্তমান ওপেনিং পাসওয়ার্ডটি সঠিক নয়!");
+    return;
+  }
+  if (!newP || newP.length < 4) {
+    showToast("⚠️ নতুন পাসওয়ার্ড কমপক্ষে ৪ অক্ষরের হতে হবে!");
+    return;
+  }
+  localStorage.setItem("diary_gate_password", newP);
+  localStorage.setItem("gate_auth_time", String(Date.now()));
+  window.closeChangeGateModal();
+  showToast("✅ ওপেনিং পাসওয়ার্ড সফলভাবে পরিবর্তিত হয়েছে!");
+};
+
+/* ==========================================================================
+   ব্যক্তিগত ডায়েরি অটো-লক (২০ মিনিট নিষ্ক্রিয় থাকলে)
+   ========================================================================== */
 var AUTO_LOCK_TIMEOUT_MS = 20 * 60 * 1000;
 var lastActivityTime = Date.now();
 
@@ -779,11 +887,12 @@ function checkInactivityTimeout() {
 setInterval(checkInactivityTimeout, 10000);
 document.addEventListener("visibilitychange", function() {
   if (!document.hidden) {
+    checkGateLock();
     checkInactivityTimeout();
   }
 });
 
-/* অফলাইন স্টোরেজ ও পেন্ডিং কিউ লজিক */
+/* অফলাইন স্টোরেজ ও পেন্ডিং কিউ লজিক[span_17](start_span)[span_17](end_span) */
 function getStorageKey(diary) {
   return "offline_diary_pages_" + (diary || currentDiary);
 }
@@ -952,7 +1061,7 @@ function showToast(msg) {
   }
 }
 
-/* পোর্টাল ইন্টারফেস লজিক */
+/* পোর্টাল ইন্টারফেস লজিক[span_18](start_span)[span_18](end_span) */
 window.switchPortalTab = function(type) {
   checkInactivityTimeout();
   if (type === "personal" && !isPersonalUnlocked) {
@@ -1053,15 +1162,21 @@ function renderDiaryDropdown() {
   var menu = document.getElementById('diaryMenu');
   if (!menu) return;
   var html = '';
-  var isAllowedAdmin = isPersonalUnlocked && (diaryCategories[currentDiary] === "personal");
+  var isPersonal = isPersonalUnlocked;
+  
   var btnChangePin = document.getElementById('btnChangePinItem');
-  if (btnChangePin) btnChangePin.style.display = isAllowedAdmin ? 'flex' : 'none';
+  if (btnChangePin) btnChangePin.style.display = isPersonal ? 'flex' : 'none';
+  var btnChangeGate = document.getElementById('btnChangeGatePassItem');
+  if (btnChangeGate) btnChangeGate.style.display = isPersonal ? 'flex' : 'none';
+  var btnDelDiary = document.getElementById('btnDeleteDiaryCompletelyItem');
+  if (btnDelDiary) btnDelDiary.style.display = isPersonal ? 'flex' : 'none';
+  
   var btnDropLock = document.getElementById('btnDropLockItem');
   if (btnDropLock) btnDropLock.style.display = isPersonalUnlocked ? 'flex' : 'none';
   var fLink = document.getElementById('folderLinkItem');
   var sLink = document.getElementById('sheetLinkItem');
-  if (fLink) fLink.style.display = isAllowedAdmin ? 'flex' : 'none';
-  if (sLink) sLink.style.display = isAllowedAdmin ? 'flex' : 'none';
+  if (fLink) fLink.style.display = isPersonal ? 'flex' : 'none';
+  if (sLink) sLink.style.display = isPersonal ? 'flex' : 'none';
 
   var generals = diaryList.filter(function(d) { return (diaryCategories[d] || "general") === "general"; });
   var personals = diaryList.filter(function(d) { return (diaryCategories[d] || "general") === "personal"; });
@@ -1193,6 +1308,59 @@ window.confirmChangePin = function() {
         }
       })
       .changePersonalPin(oldPin, newPin);
+  }
+};
+
+/* ==========================================================================
+   ডায়েরি সম্পূর্ণ মুছে ফেলা (Delete Diary Completely)
+   ========================================================================== */
+window.showDeleteDiaryModal = function() {
+  var downMenu = document.getElementById('downloadMenu');
+  if (downMenu) downMenu.style.display = 'none';
+  document.getElementById('delTargetDiaryName').innerText = currentDiary;
+  document.getElementById('deleteDiaryModalOverlay').style.display = 'flex';
+};
+
+window.closeDeleteDiaryModal = function() {
+  document.getElementById('deleteDiaryModalOverlay').style.display = 'none';
+};
+
+window.confirmDeleteDiaryCompletely = function() {
+  window.closeDeleteDiaryModal();
+  if (!currentDiary) return;
+  
+  var target = currentDiary;
+  setStatus('🗑️ ডায়েরি মুছে ফেলা হচ্ছে...', 'rgba(217, 48, 37, 0.4)');
+  
+  // লোকাল ক্যাশ থেকে ডাটা অপসারণ
+  try {
+    localStorage.removeItem(getStorageKey(target));
+    localStorage.removeItem("last_opened_diary_name");
+  } catch(e) {}
+  
+  if (typeof google !== 'undefined' && google.script && google.script.run) {
+    google.script.run
+      .withSuccessHandler(function(res) {
+        if (res && res.success) {
+          showToast("🗑️ '" + target + "' ডায়েরিটি সম্পূর্ণ মুছে ফেলা হয়েছে!");
+          window.returnToHomePortal();
+          // পুনরায় ডায়েরি তালিকা আনা
+          google.script.run
+            .withSuccessHandler(function(listRes) {
+              if (listRes) {
+                diaryList = listRes.list || [];
+                diaryCategories = listRes.categories || {};
+                renderPortalItems();
+              }
+            })
+            .listAllDiaries();
+        } else {
+          showToast("❌ মোছা সম্ভব হয়নি: " + (res.error || "ত্রুটি"));
+        }
+      })
+      .deleteDiaryCompletely(target);
+  } else {
+    showToast("⚠️ নেটওয়ার্ক সংযোগ পাওয়া যায়নি");
   }
 };
 
@@ -1955,7 +2123,7 @@ window.startDirectVoice = function() {
         isDirectRecording = true;
         btn.classList.add('recording');
         btn.innerHTML = '⏹️';
-        setStatus('🔴 শুনছি... কথা শেষ হলে ৪ সেকেন্ড থামুন বা ⏹️️ চাপুন', 'rgba(217, 48, 37, 0.4)');
+        setStatus('🔴 শুনছি... কথা শেষ হলে ৪ সেকেন্ড থামুন বা ⏹️ চাপুন', 'rgba(217, 48, 37, 0.4)');
       } catch (err) {
         showToast('❌ মাইক্রোফোন চালু করা যায়নি');
       }
@@ -2017,7 +2185,7 @@ window.startDirectVoice = function() {
         showToast('⚠️ মাইক্রোফোনের অনুমতি Allow করুন');
       }
     } else {
-      showToast('⚠️ মাইক্রোফোনের অনুমতি ব্লক করা রয়েছে');
+      showToast('⚠️️ মাইক্রোফোনের অনুমতি ব্লক করা রয়েছে');
     }
   });
 };
@@ -2091,7 +2259,7 @@ async function processVoiceDataAndAppend() {
     pushCleanTextToPage(finalDeliveredText);
   } else {
     resetVoiceUI();
-    setStatus('☁️ সংরক্ষিত (' + currentDiary + ')', 'rgba(30, 142, 62, 0.4)');
+    setStatus('☁️️ সংরক্ষিত (' + currentDiary + ')', 'rgba(30, 142, 62, 0.4)');
     showToast('⚠️ কোনো স্পষ্ট কথা শনাক্ত করা যায়নি!');
   }
 }
@@ -2222,9 +2390,12 @@ window.exportWord = function(isFullDiary) {
 };
 
 window.onload = function() {
+  // ১. সাইটের ২৪ ঘণ্টার ওপেনিং গেট লক পরীক্ষা
+  checkGateLock();
+
   initCleanSpeechRecognition();
 
-  /* আনলক স্টেট ও পার্সিস্টেন্স যাচাই */
+  /* আনলক স্টেট ও পার্সিস্টেন্স যাচাই[span_19](start_span)[span_19](end_span) */
   try {
     var unl = localStorage.getItem("diary_personal_unlocked") === "true";
     var lastTime = parseInt(localStorage.getItem("diary_last_active_time") || "0", 10);
@@ -2267,4 +2438,3 @@ window.onload = function() {
 </script>
 </body>
 </html>
-
