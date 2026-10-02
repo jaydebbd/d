@@ -714,8 +714,6 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
               apiCall(prop, { newDiaryName: args[0], diaryCategory: args[1] }, successHandler, failureHandler);
             } else if (prop === 'loadDiaryData') {
               apiCall(prop, { diaryName: args[0] }, successHandler, failureHandler);
-            } else if (prop === 'processWithGemini') {
-              apiCall(prop, { rawText: args[0], apiKey: args[1] }, successHandler, failureHandler);
             } else {
               apiCall(prop, {}, successHandler, failureHandler);
             }
@@ -1379,7 +1377,7 @@ function handleLoadedData(res) {
     }
     saveToLocalStorage(currentDiary, allLoadedPages);
     
-    // রিলোড করার পর নির্বাচিত তারিখ পুনরুদ্ধার করা
+    // রিলোড করার পর সর্বশেষ নির্বাচিত তারিখ খোলা
     var savedDateKey = localStorage.getItem("last_selected_date_key");
     if (savedDateKey) {
       window.selectDateKey(savedDateKey);
@@ -1643,11 +1641,65 @@ window.saveApiKey = function() {
   window.closeApiKeyModal();
 };
 
-window.refineWithAI = function(btn) {
+/* ==========================================================================
+   সরাসরি ব্রাউজার ভিত্তিক Gemini AI টেক্সট প্রুফরিডার (REST API)
+   ========================================================================== */
+var GEMINI_TEXT_MODELS = [
+  'gemini-3.8-flash',
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite',
+  'gemini-3.5-flash-lite'
+];
+
+async function callDirectGeminiRefine(rawText, key) {
+  var prompt = "তুমি বাংলা ভাষার অভিজ্ঞ সম্পাদক। নিচে বাংলায় কিছু লেখা দেওয়া হলো। " +
+    "এর মূল কথা ও ভাব অপরিবর্তিত রেখে বানান শুদ্ধ করো এবং অর্থ অনুসারে যথাযথ স্থানে " +
+    "দাঁড়ি (।), কমা (,), প্রশ্নবোধক (?) ইত্যাদি যতিচিহ্ন বসিয়ে একটি পরিপাটি অনুচ্ছেদ তৈরি করে দাও। " +
+    "কোনো বাড়তি ভূমিকা, ব্যাখ্যা, নোট বা ইংরেজি শব্দ লিখবে না, শুধু চূড়ান্ত বাংলা লেখাটি দেবে:\n\n" + rawText;
+
+  var lastErr = null;
+  for (var i = 0; i < GEMINI_TEXT_MODELS.length; i++) {
+    var model = GEMINI_TEXT_MODELS[i];
+    var endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
+    var payload = {
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.1 }
+    };
+
+    try {
+      var res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': key
+        },
+        body: JSON.stringify(payload)
+      });
+
+      var json = null;
+      try { json = await res.json(); } catch(e) {}
+
+      if (res.ok && json && json.candidates && json.candidates[0] && json.candidates[0].content && json.candidates[0].content.parts) {
+        var out = String(json.candidates[0].content.parts[0].text || '').trim();
+        return out.replace(/^\s*```(?:text|plaintext|markdown)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+      } else {
+        var msg = (json && json.error && json.error.message) ? json.error.message : ('HTTP ' + res.status);
+        lastErr = new Error(msg);
+        if (res.status === 400 || res.status === 401 || res.status === 403) break;
+      }
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+  throw lastErr || new Error('Gemini এআই থেকে উত্তর পাওয়া যায়নি');
+}
+
+window.refineWithAI = async function(btn) {
   var pageEl = btn.closest('.diary-page');
   var contentEl = pageEl.querySelector('.diary-content');
   var text = contentEl.innerText.trim();
-  var key = localStorage.getItem('diary_gemini_api_key') || localStorage.getItem('gemini_diary_api_key');
+  var key = (localStorage.getItem('diary_gemini_api_key') || localStorage.getItem('gemini_diary_api_key') || '').trim();
+  
   if (!key) {
     showToast('⚠️ মেনু থেকে আগে আপনার Gemini API Key দিন!');
     window.showApiKeyModal();
@@ -1657,34 +1709,33 @@ window.refineWithAI = function(btn) {
     showToast('⚠️ আগে পাতায় কিছু লিখুন!');
     return;
   }
+
   btn.innerText = '✨ AI সাজাচ্ছে...';
   btn.disabled = true;
   setStatus('🤖 জেমিনি দাঁড়ি-কমা ও বানান ঠিক করছে...', 'rgba(234, 134, 0, 0.4)');
-  google.script.run
-    .withSuccessHandler(function(res) {
-      btn.innerText = '✨ AI ঠিক করুন';
-      btn.disabled = false;
-      if (res && res.success) {
-        contentEl.innerText = res.text;
-        var pData = allLoadedPages.find(function(p) { return p.id === pageEl.id; });
-        if (pData) {
-          pData.content = res.text;
-          window.savePageData(pData, false);
-        }
-        showToast('✨ দাঁড়ি-কমা ও ব্যাকরণ ঠিক করা হয়েছে!');
-        setStatus('✅ AI সম্পাদন সম্পন্ন', 'rgba(30, 142, 62, 0.4)');
-      } else {
-        showToast('❌ ' + (res.error || 'AI এরর'));
-        setStatus('❌ AI ত্রুটি', 'rgba(217, 48, 37, 0.4)');
+
+  try {
+    var refinedText = await callDirectGeminiRefine(text, key);
+    if (refinedText) {
+      contentEl.innerText = refinedText;
+      var pData = allLoadedPages.find(function(p) { return p.id === pageEl.id; });
+      if (pData) {
+        pData.content = refinedText;
+        window.savePageData(pData, false);
       }
-    })
-    .withFailureHandler(function() {
-      btn.innerText = '✨ AI ঠিক করুন';
-      btn.disabled = false;
-      showToast('❌ এআই সংযোগে সমস্যা হয়েছে');
-      setStatus('❌ সংযোগ ত্রুটি', 'rgba(217, 48, 37, 0.4)');
-    })
-    .processWithGemini(text, key);
+      showToast('✨ দাঁড়ি-কমা ও ব্যাকরণ ঠিক করা হয়েছে!');
+      setStatus('✅ AI সম্পাদন সম্পন্ন', 'rgba(30, 142, 62, 0.4)');
+    } else {
+      showToast('⚠️ কোনো পরিবর্তন পাওয়া যায়নি');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('❌ এআই সমস্যা: ' + (err.message || 'সংযোগ করা যায়নি'));
+    setStatus('❌ AI সংযোগ ত্রুটি', 'rgba(217, 48, 37, 0.4)');
+  } finally {
+    btn.innerText = '✨ AI ঠিক করুন';
+    btn.disabled = false;
+  }
 };
 
 /* ==========================================================================
@@ -1701,7 +1752,7 @@ var browserSupportsSpeech = !!(window.SpeechRecognition || window.webkitSpeechRe
 var liveBrowserFinalSegments = [];
 var silenceTimer = null;
 
-var GEMINI_MODELS = [
+var GEMINI_AUDIO_MODELS = [
   'gemini-3.5-transcribe',
   'gemini-3.8-flash',
   'gemini-3.5-flash-lite',
@@ -1794,8 +1845,8 @@ async function transcribeAudioViaGemini(blob, mime) {
                'Return ONLY the final Bengali transcript without any preamble or notes.';
 
   var last = null;
-  for (var i = 0; i < GEMINI_MODELS.length; i++) {
-    var model = GEMINI_MODELS[i];
+  for (var i = 0; i < GEMINI_AUDIO_MODELS.length; i++) {
+    var model = GEMINI_AUDIO_MODELS[i];
     try {
       setStatus('🤖 Gemini ' + model + ' দিয়ে কথা প্রসেস হচ্ছে...', 'rgba(106, 27, 154, 0.4)');
       var t = await geminiAudioGenerate(model, key, cleanMime, b64, prompt);
@@ -1832,7 +1883,6 @@ function initCleanSpeechRecognition() {
         liveBrowserFinalSegments = finals;
       }
 
-      // ৪ সেকেন্ড কোনো কথা না বললে স্বয়ংক্রিয়ভাবে বন্ধ হবে
       clearTimeout(silenceTimer);
       silenceTimer = setTimeout(function() {
         if (isDirectRecording) {
@@ -1905,7 +1955,7 @@ window.startDirectVoice = function() {
         isDirectRecording = true;
         btn.classList.add('recording');
         btn.innerHTML = '⏹️';
-        setStatus('🔴 শুনছি... কথা শেষ হলে ৪ সেকেন্ড থামুন বা ⏹️ চাপুন', 'rgba(217, 48, 37, 0.4)');
+        setStatus('🔴 শুনছি... কথা শেষ হলে ৪ সেকেন্ড থামুন বা ⏹️️ চাপুন', 'rgba(217, 48, 37, 0.4)');
       } catch (err) {
         showToast('❌ মাইক্রোফোন চালু করা যায়নি');
       }
@@ -2024,19 +2074,12 @@ async function processVoiceDataAndAppend() {
     finalDeliveredText = browserFallbackText;
   }
 
-  // ৩. টেক্সট থাকলে এবং API থাকলে Gemini দিয়ে পুনরাবৃত্তি/বানান পরিষ্কারকরণ
-  if (finalDeliveredText && apiKey && navigator.onLine && typeof google !== 'undefined' && google.script && google.script.run) {
+  // ৩. ডাইরেক্ট ব্রাউজার থেকে Gemini দিয়ে টেক্সট পরিপাটি ও শুদ্ধ করা
+  if (finalDeliveredText && apiKey && navigator.onLine) {
     try {
       setStatus('✨ Gemini দিয়ে পরিপাটি অনুচ্ছেদ সাজানো হচ্ছে...', 'rgba(106, 27, 154, 0.4)');
-      google.script.run
-        .withSuccessHandler(function(res) {
-          var cleanText = (res && res.success && res.text) ? res.text : finalDeliveredText;
-          pushCleanTextToPage(cleanText);
-        })
-        .withFailureHandler(function() {
-          pushCleanTextToPage(finalDeliveredText);
-        })
-        .processWithGemini(finalDeliveredText, apiKey);
+      var cleaned = await callDirectGeminiRefine(finalDeliveredText, apiKey);
+      pushCleanTextToPage(cleaned || finalDeliveredText);
       return;
     } catch (e) {
       pushCleanTextToPage(finalDeliveredText);
@@ -2224,3 +2267,4 @@ window.onload = function() {
 </script>
 </body>
 </html>
+
