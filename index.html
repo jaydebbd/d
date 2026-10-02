@@ -432,7 +432,7 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 }
 #loadingBox { text-align: center; padding: 40px 10px; color: #666; font-size: 15px; }
 
-/* Modal Stying */
+/* Modal Styling */
 .custom-modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -639,9 +639,7 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 
 <script src="config.js"></script>
 <script>
-/* JB-Diary GitHub Frontend → Apps Script JSONP Bridge
-   This keeps the existing google.script.run-style code working from GitHub Pages.
-*/
+/* JB-Diary GitHub Frontend → Apps Script JSONP Bridge */
 (function () {
   'use strict';
   window.JB_DIARY_API_URL = window.JB_DIARY_API_URL || 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_EXEC_URL_HERE';
@@ -691,8 +689,6 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
     document.head.appendChild(script);
   }
 
-  /* Compatibility shim: the original diary code can continue using
-     google.script.run.withSuccessHandler(...).method(...). */
   window.google = window.google || {};
   window.google.script = window.google.script || {};
   Object.defineProperty(window.google.script, 'run', {
@@ -710,8 +706,6 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
           }
           return function () {
             var args = Array.prototype.slice.call(arguments);
-            /* The backend wrapper derives dayPages/remainingDayPages itself,
-               so large arrays are not sent through the URL. */
             if (prop === 'saveOrUpdatePage') {
               apiCall(prop, { diaryName: args[0], pageData: args[1] }, successHandler, failureHandler);
             } else if (prop === 'deletePageFromSheet') {
@@ -737,11 +731,12 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
   });
 })();
 </script>
+
 <script>
 window.addEventListener('load', function(){
   if (window.JB_DIARY_API_URL && window.JB_DIARY_API_URL.indexOf('PASTE_') === 0) {
     setTimeout(function(){
-      if (typeof showToast === 'function') showToast('⚙️ GitHub Frontend চালু হয়েছে—Apps Script Web App URL এখনো বসানো হয়নি।');
+      if (typeof showToast === 'function') showToast('⚙️ Apps Script Web App URL এখনো config.js-এ বসানো হয়নি।');
     }, 700);
   }
 });
@@ -761,14 +756,15 @@ var currentActiveDateKey = "";
 var saveTimers = {};
 var isSyncingPending = false;
 
-var AUTO_LOCK_TIMEOUT_MS = 20 * 60 * 1000;
+/* অটো-লক (২০ মিনিট নিষ্ক্রিয় থাকলে) এবং সেশন পার্সিস্টেন্স */
+var AUTO_LOCK_TIMEOUT_MS = 20 * 60 * 1000; // ২০ মিনিট
 var lastActivityTime = Date.now();
 
 function updateLastActivity() {
   lastActivityTime = Date.now();
   try {
     if (isPersonalUnlocked) {
-      sessionStorage.setItem("diary_last_active_time", String(lastActivityTime));
+      localStorage.setItem("diary_last_active_time", String(lastActivityTime));
     }
   } catch(e) {}
 }
@@ -776,7 +772,7 @@ function updateLastActivity() {
 function checkInactivityTimeout() {
   if (!isPersonalUnlocked) return;
   var now = Date.now();
-  var storedLast = parseInt(sessionStorage.getItem("diary_last_active_time") || "0", 10);
+  var storedLast = parseInt(localStorage.getItem("diary_last_active_time") || "0", 10);
   var effectiveLast = Math.max(lastActivityTime, storedLast);
   if (now - effectiveLast > AUTO_LOCK_TIMEOUT_MS) {
     window.lockPersonalDiaries(true);
@@ -809,7 +805,7 @@ window.handleToggleAiRefine = function(isChecked) {
   if (isChecked) {
     showToast("✨ ভয়েস লেখায় স্বয়ংক্রিয় AI সম্পাদন চালু করা হয়েছে");
   } else {
-    showToast("⚡ গিটহাবের লেখা সরাসরি ডায়েরিতে যোগ হবে (AI ছাড়াই)");
+    showToast("⚡ ভয়েসের লেখা সরাসরি ডায়েরিতে যোগ হবে (AI ছাড়াই)");
   }
 };
 
@@ -882,7 +878,7 @@ function syncPendingQueue() {
     if (currentQueue.length === 0) {
       isSyncingPending = false;
       setStatus('☁️ ড্রাইভ ও শিট সংযুক্ত', 'rgba(30, 142, 62, 0.4)');
-      showToast('☁️ অফলাইনের সব লেখা সফলভাবে অনলাইনে সেভ হয়েছে!');
+      showToast('☁️ অফলাইনের সব লেখা অনলাইনে সংরক্ষিত হয়েছে!');
       return;
     }
     var item = currentQueue[0];
@@ -912,12 +908,12 @@ function syncPendingQueue() {
 }
 
 window.addEventListener('online', function() {
-  setStatus('📶 ইন্টারনেট সংযুক্ত হয়েছে, সিঙ্ক হচ্ছে...', 'rgba(30, 142, 62, 0.4)');
+  setStatus('📶 ইন্টারনেট সংযুক্ত হয়েছে, ব্যাকআপ শুরু...', 'rgba(30, 142, 62, 0.4)');
   syncPendingQueue();
 });
 window.addEventListener('offline', function() {
   setStatus('📴 অফলাইন মোড (লেখা ডিভাইসে সেভ হচ্ছে)', 'rgba(234, 134, 0, 0.4)');
-  showToast('⚠️ ইন্টারনেট সংযোগ বিচ্ছিন্ন! লেখা লোকালি সেভ হচ্ছে।');
+  showToast('⚠️ ইন্টারনেট সংযোগ নেই! লেখা ডিভাইসে অফলাইনে সেভ থাকবে।');
 });
 setInterval(function() {
   if (navigator.onLine) {
@@ -991,7 +987,7 @@ function showToast(msg) {
   }
 }
 
-// পোর্টাল লজিক
+/* পোর্টাল ইন্টারফেস লজিক */
 window.switchPortalTab = function(type) {
   checkInactivityTimeout();
   if (type === "personal" && !isPersonalUnlocked) {
@@ -1136,8 +1132,8 @@ function renderDiaryDropdown() {
 window.lockPersonalDiaries = function(isAuto) {
   isPersonalUnlocked = false;
   try {
-    sessionStorage.removeItem("diary_personal_unlocked");
-    sessionStorage.removeItem("diary_last_active_time");
+    localStorage.removeItem("diary_personal_unlocked");
+    localStorage.removeItem("diary_last_active_time");
   } catch(e) {}
   if (isAuto) {
     showToast("🔒 ২০ মিনিট নিষ্ক্রিয় থাকায় ব্যক্তিগত ডায়েরি লক হয়েছে!");
@@ -1170,7 +1166,7 @@ window.promptPersonalUnlock = function(target) {
           if (res && res.success) {
             isPersonalUnlocked = true;
             updateLastActivity();
-            try { sessionStorage.setItem("diary_personal_unlocked", "true"); } catch(e) {}
+            try { localStorage.setItem("diary_personal_unlocked", "true"); } catch(e) {}
             if (target) {
               window.enterDiaryPage(target);
             } else {
@@ -1212,7 +1208,7 @@ window.closeChangePinModal = function() {
 window.confirmChangePin = function() {
   var oldPin = document.getElementById('oldPinInput').value.trim();
   var newPin = document.getElementById('newPinInput').value.trim();
-  if (!oldPin) { showToast("⚠️️ বর্তমান পাসওয়ার্ড লিখুন!"); return; }
+  if (!oldPin) { showToast("⚠ বর্তমান পাসওয়ার্ড লিখুন!"); return; }
   if (!newPin || newPin.length < 4) { showToast("⚠️ নতুন পাসওয়ার্ড কমপক্ষে ৪ সংখ্যার দিন!"); return; }
   window.closeChangePinModal();
   setStatus('🔑 পাসওয়ার্ড পরিবর্তন হচ্ছে...', 'rgba(234, 134, 0, 0.4)');
@@ -1252,7 +1248,7 @@ window.closeCreateDiaryModal = function() {
 window.confirmCreateDiary = function() {
   var nameInput = document.getElementById('newDiaryNameInput');
   var name = nameInput.value.trim();
-  if (!name) { showToast("⚠️️ অনুগ্রহ করে ডায়েরির নাম লিখুন!"); return; }
+  if (!name) { showToast("⚠ অনুগ্রহ করে ডায়েরির নাম লিখুন!"); return; }
   var radios = document.getElementsByName('diaryCategoryRadio');
   var cat = "general";
   for (var i = 0; i < radios.length; i++) {
@@ -1275,6 +1271,7 @@ window.confirmCreateDiary = function() {
           if (cat === "personal") {
             isPersonalUnlocked = true;
             updateLastActivity();
+            try { localStorage.setItem("diary_personal_unlocked", "true"); } catch(e) {}
           }
           handleLoadedData(res);
         }
@@ -1538,7 +1535,7 @@ window.savePageData = function(pageData, isManual, callback) {
       .withFailureHandler(function() {
         addToPendingQueue(currentDiary, pageData, dayPages);
         if (ind) ind.innerText = 'লোকালি সেভড';
-        setStatus('⚠️ অফলাইনে রাখা হয়েছে (সংযোগ ত্রুটি)', 'rgba(234, 134, 0, 0.4)');
+        setStatus('⚠️️ অফলাইনে রাখা হয়েছে (সংযোগ ত্রুটি)', 'rgba(234, 134, 0, 0.4)');
         if (callback) callback();
       })
       .saveOrUpdatePage(currentDiary, pageData, dayPages);
@@ -1903,15 +1900,17 @@ window.exportWord = function(isFullDiary) {
 window.onload = function() {
   updateAiSwitchUI(isAiAutoRefineEnabled());
 
+  /* সাইট রিলোড বা বন্ধ করে ফিরে আসলেও আনলক স্টেট ও সময় যাচাই */
   try {
-    var unl = sessionStorage.getItem("diary_personal_unlocked") === "true";
-    var lastTime = parseInt(sessionStorage.getItem("diary_last_active_time") || "0", 10);
+    var unl = localStorage.getItem("diary_personal_unlocked") === "true";
+    var lastTime = parseInt(localStorage.getItem("diary_last_active_time") || "0", 10);
     if (unl && (Date.now() - lastTime < AUTO_LOCK_TIMEOUT_MS)) {
       isPersonalUnlocked = true;
-      lastActivityTime = lastTime;
+      lastActivityTime = Date.now();
+      localStorage.setItem("diary_last_active_time", String(lastActivityTime));
     } else {
-      sessionStorage.removeItem("diary_personal_unlocked");
-      sessionStorage.removeItem("diary_last_active_time");
+      localStorage.removeItem("diary_personal_unlocked");
+      localStorage.removeItem("diary_last_active_time");
     }
   } catch(e) {}
 
@@ -1930,12 +1929,4 @@ window.onload = function() {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
 
