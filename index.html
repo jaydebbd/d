@@ -18,7 +18,7 @@
   --offline: #e37400;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; width: 100%; min-height: 100vh; }
+body { background-color: var(--bg); color: var(--text); padding-bottom: 95px; width: 100%; min-height: 100vh; }
 .header { background: linear-gradient(135deg, #1a73e8, #0d47a1); color: white; padding: 12px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15); width: 100%; }
 .header h1 { font-size: 19px; font-weight: 600; }
 .save-status-bar {
@@ -335,7 +335,7 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
   border-bottom: 1px dashed rgba(140, 115, 85, 0.2);
 }
 .diary-content:empty:before {
-  content: "এখানে আপনার ডায়েরির পাতা লিখুন... (পাতা পূর্ণ হলে পরবর্তী পাতা তৈরি হবে)";
+  content: "এখানে আপনার ডায়েরির পাতা লিখুন... (নিচের মাইক চেপে মুখে বলুন)";
   color: #999;
 }
 .photo-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
@@ -397,30 +397,44 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
   cursor: pointer;
 }
 .page-save-indicator { font-size: 12px; color: #555; font-weight: 500; }
+
+/* লাইভ ভাসমান ডাইরেক্ট মাইক বাটন */
 .voice-fab {
   position: fixed;
   right: 18px;
   bottom: 24px;
-  width: 58px;
-  height: 58px;
+  width: 60px;
+  height: 60px;
   border: none;
   border-radius: 50%;
   background: linear-gradient(135deg, #6a1b9a, #8e24aa);
   color: white;
-  font-size: 25px;
+  font-size: 26px;
   cursor: pointer;
   z-index: 9998;
-  box-shadow: 0 5px 18px rgba(106,27,154, 0.35);
+  box-shadow: 0 5px 18px rgba(106,27,154, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
 }
+.voice-fab.recording {
+  background: #d93025;
+  box-shadow: 0 0 0 0 rgba(217,48,37,.4);
+  animation: pulseMic 1.3s infinite;
+}
+@keyframes pulseMic {
+  0% { box-shadow: 0 0 0 0 rgba(217,48,37,.5); }
+  70% { box-shadow: 0 0 0 18px rgba(217,48,37,0); }
+  100% { box-shadow: 0 0 0 0 rgba(217,48,37,0); }
+}
+
 .toast-msg {
   position: fixed;
   bottom: 25px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(33, 33, 33, 0.92);
+  background: rgba(33, 33, 33, 0.94);
   color: white;
   padding: 10px 20px;
   border-radius: 25px;
@@ -472,7 +486,7 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 <div class="header">
   <h1>📖 অনলাইন ডায়েরি</h1>
   <div class="save-status-bar" id="globalStatus">
-    <span>☁️ ড্রাইভ ও শিট সংযুক্ত</span>
+    <span>☁️️ ড্রাইভ ও শিট সংযুক্ত</span>
   </div>
 </div>
 
@@ -543,7 +557,7 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
   <!-- AI অটো-কারেকশন অন/অফ সুইচ ব্যানার -->
   <div class="ai-switch-banner">
     <div class="switch-label-wrap">
-      <span>✨ ভয়েস লেখায় AI অটো-কারেকশন:</span>
+      <span>✨ সরাসরি ভয়েসে AI ব্যাকরণ শুদ্ধিকরণ:</span>
       <b id="aiSwitchStatusText" style="color:#888;">বন্ধ</b>
     </div>
     <label class="toggle-switch">
@@ -561,7 +575,8 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
   <div id="entriesList" style="display:none;"></div>
 </div>
 
-<button type="button" id="voiceFab" class="voice-fab" style="display:none;" title="ভয়েস দিয়ে লিখুন" onclick="window.toggleVoiceDiary()">🎙️</button>
+<!-- সরাসরি ইন-পেজ ভয়েস বাটন -->
+<button type="button" id="voiceFab" class="voice-fab" style="display:none;" title="মুখে কথা বলে লিখুন" onclick="window.toggleDirectVoice()">🎙️</button>
 <div id="toastBox" class="toast-msg"></div>
 
 <!-- API Key Modal -->
@@ -569,9 +584,9 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
   <div class="custom-modal-card">
     <div class="modal-title" style="color:#6a1b9a;">Gemini API কী সেট করুন</div>
     <div style="font-size: 13px; color: #555; margin-bottom: 8px; line-height: 1.5;">
-      মুখে কথা বলার পর স্বয়ংক্রিয়ভাবে দাঁড়ি-কমা ও ব্যাকরণ ঠিক করতে আপনার গুগল জেমিনির API Key দিন।
+      মুখে কথা বললে স্বয়ংক্রিয়ভাবে অডিও ট্রান্সক্রিপশন ও ব্যাকরণ নির্ভুল করতে আপনার গুগল জেমিনির API Key দিন।
     </div>
-    <input type="password" id="geminiApiKeyInput" class="modal-input" placeholder="AIzaSy... অথবা AQ.Ab8..." />
+    <input type="password" id="geminiApiKeyInput" class="modal-input" placeholder="AIzaSy..." />
     <div class="modal-actions">
       <button type="button" class="btn-modal-cancel" onclick="window.closeApiKeyModal()">বাতিল</button>
       <button type="button" class="btn-modal-confirm" style="background:#6a1b9a;" onclick="window.saveApiKey()">সংরক্ষণ করুন</button>
@@ -756,8 +771,8 @@ var currentActiveDateKey = "";
 var saveTimers = {};
 var isSyncingPending = false;
 
-/* অটো-লক (২০ মিনিট নিষ্ক্রিয় থাকলে) এবং সেশন পার্সিস্টেন্স */
-var AUTO_LOCK_TIMEOUT_MS = 20 * 60 * 1000; // ২০ মিনিট
+/* অটো-লক (২০ মিনিট নিষ্ক্রিয় থাকলে) এবং স্থায়ী আনলক স্টেট */
+var AUTO_LOCK_TIMEOUT_MS = 20 * 60 * 1000;
 var lastActivityTime = Date.now();
 
 function updateLastActivity() {
@@ -789,12 +804,7 @@ document.addEventListener("visibilitychange", function() {
   }
 });
 
-var VOICE_HELPER_URL = "https://jaydebbd.github.io/JB-Diary/voice.html";
-var isVoiceRecording = false;
-var voiceTargetPage = null;
-var voiceHelperWindow = null;
-var voiceSessionToken = null;
-
+/* AI Auto-Refine Switch */
 function isAiAutoRefineEnabled() {
   return localStorage.getItem("diary_ai_auto_refine") === "true";
 }
@@ -803,9 +813,9 @@ window.handleToggleAiRefine = function(isChecked) {
   localStorage.setItem("diary_ai_auto_refine", isChecked ? "true" : "false");
   updateAiSwitchUI(isChecked);
   if (isChecked) {
-    showToast("✨ ভয়েস লেখায় স্বয়ংক্রিয় AI সম্পাদন চালু করা হয়েছে");
+    showToast("✨ সরাসরি ভয়েসে AI ব্যাকরণ শুদ্ধিকরণ চালু হয়েছে");
   } else {
-    showToast("⚡ ভয়েসের লেখা সরাসরি ডায়েরিতে যোগ হবে (AI ছাড়াই)");
+    showToast("⚡ সাধারণ ভয়েস সরাসরি ডায়েরিতে যোগ হবে");
   }
 };
 
@@ -819,6 +829,7 @@ function updateAiSwitchUI(isEnabled) {
   }
 }
 
+/* অফলাইন স্টোরেজ ও পেন্ডিং কিউ লজিক */
 function getStorageKey(diary) {
   return "offline_diary_pages_" + (diary || currentDiary);
 }
@@ -983,7 +994,7 @@ function showToast(msg) {
   if (toast) {
     toast.innerText = msg;
     toast.style.display = 'block';
-    setTimeout(function() { toast.style.display = 'none'; }, 2500);
+    setTimeout(function() { toast.style.display = 'none'; }, 2800);
   }
 }
 
@@ -1041,6 +1052,7 @@ window.enterDiaryPage = function(dName) {
 };
 
 window.returnToHomePortal = function() {
+  if (isDirectRecording) window.stopDirectVoice(true);
   document.getElementById('mainDiaryView').style.display = 'none';
   document.getElementById('voiceFab').style.display = 'none';
   document.getElementById('portalView').style.display = 'block';
@@ -1535,7 +1547,7 @@ window.savePageData = function(pageData, isManual, callback) {
       .withFailureHandler(function() {
         addToPendingQueue(currentDiary, pageData, dayPages);
         if (ind) ind.innerText = 'লোকালি সেভড';
-        setStatus('⚠️️ অফলাইনে রাখা হয়েছে (সংযোগ ত্রুটি)', 'rgba(234, 134, 0, 0.4)');
+        setStatus('⚠ অফলাইনে রাখা হয়েছে (সংযোগ ত্রুটি)', 'rgba(234, 134, 0, 0.4)');
         if (callback) callback();
       })
       .saveOrUpdatePage(currentDiary, pageData, dayPages);
@@ -1634,7 +1646,7 @@ window.showApiKeyModal = function() {
   var dMenu = document.getElementById('downloadMenu');
   if (dMenu) dMenu.style.display = 'none';
   document.getElementById('apiKeyModalOverlay').style.display = 'flex';
-  document.getElementById('geminiApiKeyInput').value = localStorage.getItem('gemini_diary_api_key') || '';
+  document.getElementById('geminiApiKeyInput').value = localStorage.getItem('gemini_diary_api_key') || localStorage.getItem('diary_gemini_api_key') || '';
 };
 
 window.closeApiKeyModal = function() {
@@ -1645,9 +1657,11 @@ window.saveApiKey = function() {
   var key = document.getElementById('geminiApiKeyInput').value.trim();
   if (key) {
     localStorage.setItem('gemini_diary_api_key', key);
+    localStorage.setItem('diary_gemini_api_key', key);
     showToast('🔑 Gemini API Key সংরক্ষিত হয়েছে!');
   } else {
     localStorage.removeItem('gemini_diary_api_key');
+    localStorage.removeItem('diary_gemini_api_key');
     showToast('⚠️ API Key মুছে ফেলা হয়েছে!');
   }
   window.closeApiKeyModal();
@@ -1657,7 +1671,7 @@ window.refineWithAI = function(btn) {
   var pageEl = btn.closest('.diary-page');
   var contentEl = pageEl.querySelector('.diary-content');
   var text = contentEl.innerText.trim();
-  var key = localStorage.getItem('gemini_diary_api_key');
+  var key = localStorage.getItem('gemini_diary_api_key') || localStorage.getItem('diary_gemini_api_key');
   if (!key) {
     showToast('⚠️ মেনু থেকে আগে আপনার Gemini API Key দিন!');
     window.showApiKeyModal();
@@ -1697,6 +1711,378 @@ window.refineWithAI = function(btn) {
     .processWithGemini(text, key);
 };
 
+/* ==========================================================================
+   সরাসরি পেজে ভয়েস রিকগনিশন ও ট্রান্সক্রিপশন ইঞ্জিন (Multi-engine Voice System)
+   ========================================================================== */
+var isDirectRecording = false;
+var isDirectProcessing = false;
+var mediaStreamObj = null;
+var mediaRecorderObj = null;
+var audioChunksList = [];
+var selectedAudioMime = '';
+var speechRecognizer = null;
+var browserSupportsSpeech = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+var speechFinalParts = [];
+var speechInterimText = '';
+var silenceTimer = null;
+
+var GEMINI_MODELS = [
+  'gemini-3.5-transcribe',
+  'gemini-3.8-flash',
+  'gemini-3.5-flash-lite',
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite'
+];
+
+function getActiveGeminiKey() {
+  return (localStorage.getItem('gemini_diary_api_key') || localStorage.getItem('diary_gemini_api_key') || '').trim();
+}
+
+function chooseBestMimeType() {
+  var types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'];
+  if (!window.MediaRecorder || !MediaRecorder.isTypeSupported) return '';
+  for (var i = 0; i < types.length; i++) {
+    try { if (MediaRecorder.isTypeSupported(types[i])) return types[i]; } catch (e) {}
+  }
+  return '';
+}
+
+function convertBlobToBase64(blob) {
+  return new Promise(function(resolve, reject) {
+    var reader = new FileReader();
+    reader.onloadend = function() {
+      var str = String(reader.result || '');
+      var commaIdx = str.indexOf(',');
+      commaIdx < 0 ? reject(new Error('Audio base64 error')) : resolve(str.slice(commaIdx + 1));
+    };
+    reader.onerror = function() { reject(new Error('Audio read error')); };
+    reader.readAsDataURL(blob);
+  });
+}
+
+function extractTranscriptText(json) {
+  var textOut = '', candidates = (json && json.candidates) || [];
+  for (var i = 0; i < candidates.length; i++) {
+    var parts = candidates[i].content && candidates[i].content.parts ? candidates[i].content.parts : [];
+    for (var j = 0; j < parts.length; j++) {
+      if (parts[j].text) textOut += String(parts[j].text);
+    }
+    if (textOut.trim()) break;
+  }
+  return textOut.replace(/^\s*```(?:text|plaintext|markdown)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+}
+
+async function requestGeminiAudioTranscript(model, key, mime, base64Audio, prompt) {
+  var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
+  var body = {
+    contents: [{
+      role: 'user',
+      parts: [
+        { text: prompt },
+        { inlineData: { mimeType: mime, data: base64Audio } }
+      ]
+    }],
+    generationConfig: { temperature: 0.05 }
+  };
+
+  var res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+    body: JSON.stringify(body)
+  });
+
+  var raw = await res.text(), json = null;
+  try { json = JSON.parse(raw); } catch (e) {}
+  if (!res.ok) {
+    var msg = json && json.error && json.error.message ? String(json.error.message) : ('HTTP ' + res.status);
+    var err = new Error(msg);
+    err.status = res.status;
+    throw err;
+  }
+  var out = extractTranscriptText(json);
+  if (!out) throw new Error('কোনো transcript আসেনি');
+  return out;
+}
+
+async function processAudioWithGemini(blob, mime) {
+  var key = getActiveGeminiKey();
+  if (!key) throw new Error('Gemini API Key নেই');
+  if (!blob || !blob.size) throw new Error('রেকর্ডিং খালি');
+
+  var b64 = await convertBlobToBase64(blob);
+  var cleanMime = (mime || blob.type || 'audio/webm').split(';')[0];
+  var prompt = 'Transcribe this audio into clear Bengali text. ' +
+               'Preserve the speaker\'s original meaning. Do not add explanations. ' +
+               'Use natural Bengali punctuation and return only the transcript.';
+
+  var lastErr = null;
+  for (var i = 0; i < GEMINI_MODELS.length; i++) {
+    var model = GEMINI_MODELS[i];
+    try {
+      setStatus('🤖 জেমিনি (' + model + ') ট্রান্সক্রিপ্ট তৈরি করছে...', 'rgba(106, 27, 154, 0.4)');
+      var t = await requestGeminiAudioTranscript(model, key, cleanMime, b64, prompt);
+      if (t) return { text: t, model: model };
+    } catch (e) {
+      lastErr = e;
+      if (e.status === 404) continue;
+      if (e.status === 400 && /api.?key|permission|authentication|invalid/i.test(e.message)) break;
+      if (e.status === 401 || e.status === 403) break;
+      continue;
+    }
+  }
+  throw lastErr || new Error('জেমিনি মডেল ট্রান্সক্রিপ্ট দিতে পারেনি');
+}
+
+function initSpeechRecognition() {
+  if (!browserSupportsSpeech) return;
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  try {
+    speechRecognizer = new SR();
+    speechRecognizer.lang = 'bn-BD';
+    speechRecognizer.continuous = true;
+    speechRecognizer.interimResults = true;
+    speechRecognizer.maxAlternatives = 1;
+
+    speechRecognizer.onresult = function(event) {
+      var finals = [];
+      for (var i = 0; i < event.results.length; i++) {
+        var transcript = event.results[i][0].transcript || '';
+        if (event.results[i].isFinal) finals.push(transcript);
+        else speechInterimText = transcript;
+      }
+      if (finals.length) speechFinalParts = speechFinalParts.concat(finals);
+
+      // কথা বলা বন্ধ হলে ৪ সেকেন্ড পর স্বয়ংক্রিয়ভাবে থামবে
+      clearTimeout(silenceTimer);
+      silenceTimer = setTimeout(function() {
+        if (isDirectRecording) {
+          window.stopDirectVoice(false);
+          showToast('⏱️ কথা বলা শেষ হয়েছে (অটো-স্টপ)');
+        }
+      }, 4000);
+    };
+
+    speechRecognizer.onerror = function(e) {
+      if (e && e.error === 'not-allowed') {
+        showToast('⚠️ মাইক্রোফোন পারমিশন Allow করুন।');
+      }
+    };
+  } catch (e) {
+    browserSupportsSpeech = false;
+  }
+}
+
+function stopAudioStreams() {
+  if (mediaStreamObj) {
+    try { mediaStreamObj.getTracks().forEach(function(t) { t.stop(); }); } catch (e) {}
+  }
+  mediaStreamObj = null;
+}
+
+function resetVoiceButton() {
+  isDirectRecording = false;
+  isDirectProcessing = false;
+  clearTimeout(silenceTimer);
+  var btn = document.getElementById('voiceFab');
+  if (btn) {
+    btn.classList.remove('recording');
+    btn.innerHTML = '🎙️';
+    btn.title = 'মুখে কথা বলে লিখুন';
+  }
+}
+
+function getLatestTargetPage() {
+  var pages = document.querySelectorAll('.diary-page');
+  var page = pages.length > 0 ? pages[pages.length - 1] : null;
+  if (!page) {
+    window.handleAddNewPage();
+    pages = document.querySelectorAll('.diary-page');
+    page = pages[pages.length - 1];
+  }
+  return page;
+}
+
+window.toggleDirectVoice = function() {
+  if (isDirectProcessing) return;
+  if (isDirectRecording) {
+    window.stopDirectVoice(false);
+  } else {
+    window.startDirectVoice();
+  }
+};
+
+window.startDirectVoice = function() {
+  if (isDirectProcessing || isDirectRecording) return;
+
+  var btn = document.getElementById('voiceFab');
+  speechFinalParts = [];
+  speechInterimText = '';
+  audioChunksList = [];
+  selectedAudioMime = chooseBestMimeType();
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    if (browserSupportsSpeech && speechRecognizer) {
+      try {
+        speechRecognizer.start();
+        isDirectRecording = true;
+        btn.classList.add('recording');
+        btn.innerHTML = '⏹️';
+        setStatus('🔴 ভয়েস শুনছে (ব্রাউজার স্পিচ)... কথা শেষ হলে ⏹️ চাপুন', 'rgba(217, 48, 37, 0.4)');
+      } catch (err) {
+        showToast('❌ মাইক্রোফোন চালু করা যায়নি');
+      }
+    } else {
+      showToast('❌ ব্রাউজারে মাইক্রোফোন সাপোর্ট নেই');
+    }
+    return;
+  }
+
+  navigator.mediaDevices.getUserMedia({
+    audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+  }).then(function(stream) {
+    mediaStreamObj = stream;
+    try {
+      mediaRecorderObj = selectedAudioMime
+        ? new MediaRecorder(stream, { mimeType: selectedAudioMime, audioBitsPerSecond: 96000 })
+        : new MediaRecorder(stream);
+    } catch (e) {
+      try { mediaRecorderObj = new MediaRecorder(stream); } catch (err) {
+        stopAudioStreams();
+        showToast('❌ অডিও রেকর্ডার চালু করা যায়নি');
+        return;
+      }
+    }
+
+    selectedAudioMime = mediaRecorderObj.mimeType || selectedAudioMime || 'audio/webm';
+    mediaRecorderObj.ondataavailable = function(e) {
+      if (e.data && e.data.size) audioChunksList.push(e.data);
+    };
+    mediaRecorderObj.onerror = function() {
+      stopAudioStreams();
+      resetVoiceButton();
+    };
+    mediaRecorderObj.onstop = finishAndApplyVoiceRecording;
+
+    try {
+      mediaRecorderObj.start(250);
+      isDirectRecording = true;
+      btn.classList.add('recording');
+      btn.innerHTML = '⏹️';
+      if (browserSupportsSpeech && speechRecognizer) {
+        try { speechRecognizer.start(); } catch (e) {}
+      }
+      setStatus('🔴 রেকর্ড হচ্ছে... কথা শেষ হলে ৪ সেকেন্ড থামুন বা ⏹️ চাপুন', 'rgba(217, 48, 37, 0.4)');
+    } catch (e) {
+      stopAudioStreams();
+      resetVoiceButton();
+      showToast('❌ রেকর্ডিং শুরু করা যায়নি');
+    }
+  }).catch(function(err) {
+    if (browserSupportsSpeech && speechRecognizer) {
+      try {
+        speechRecognizer.start();
+        isDirectRecording = true;
+        btn.classList.add('recording');
+        btn.innerHTML = '⏹️';
+        setStatus('🔴 ব্রাউজার স্পিচ শুনছে...', 'rgba(217, 48, 37, 0.4)');
+      } catch (e) {
+        showToast('⚠️ মাইক্রোফোনের অনুমতি দিন');
+      }
+    } else {
+      showToast('⚠️ মাইক্রোফোনের অনুমতি ব্লক করা রয়েছে');
+    }
+  });
+};
+
+window.stopDirectVoice = function(isCancel) {
+  if (!isDirectRecording) return;
+  isDirectRecording = false;
+  clearTimeout(silenceTimer);
+
+  if (speechRecognizer) {
+    try { speechRecognizer.stop(); } catch (e) {}
+  }
+
+  if (mediaRecorderObj && mediaRecorderObj.state !== 'inactive') {
+    try {
+      if (isCancel) mediaRecorderObj.onstop = null;
+      mediaRecorderObj.stop();
+    } catch (e) {}
+  } else {
+    stopAudioStreams();
+    if (!isCancel) finishAndApplyVoiceRecording();
+    else resetVoiceButton();
+  }
+};
+
+async function finishAndApplyVoiceRecording() {
+  stopAudioStreams();
+  isDirectProcessing = true;
+  var btn = document.getElementById('voiceFab');
+  if (btn) btn.innerHTML = '⏳';
+
+  var audioBlob = new Blob(audioChunksList, { type: selectedAudioMime || 'audio/webm' });
+  audioChunksList = [];
+
+  var liveBrowserText = speechFinalParts.join(' ').trim();
+  if (speechInterimText) liveBrowserText += (liveBrowserText ? ' ' : '') + speechInterimText;
+
+  var targetPage = getLatestTargetPage();
+  var apiKey = getActiveGeminiKey();
+  var autoRefine = isAiAutoRefineEnabled();
+
+  // ১. জেমিনি অডিও ট্রান্সক্রিপশন চেষ্টা
+  var finalVoiceTranscript = '';
+  if (apiKey && audioBlob.size > 0 && navigator.onLine) {
+    try {
+      setStatus('🤖 জেমিনি অডিও শুনে টেক্সট তৈরি করছে...', 'rgba(106, 27, 154, 0.4)');
+      var geminiResult = await processAudioWithGemini(audioBlob, selectedAudioMime);
+      if (geminiResult && geminiResult.text) {
+        finalVoiceTranscript = geminiResult.text;
+      }
+    } catch (err) {
+      console.warn('Gemini audio transcribe fallback to browser:', err);
+    }
+  }
+
+  // ২. ফলব্যাক: ব্রাউজার স্পিচ রিকগনিশন
+  if (!finalVoiceTranscript) {
+    finalVoiceTranscript = liveBrowserText;
+  }
+
+  if (!finalVoiceTranscript.trim()) {
+    resetVoiceButton();
+    setStatus('☁️ সংরক্ষিত (' + currentDiary + ')', 'rgba(30, 142, 62, 0.4)');
+    showToast('⚠️ কোনো কথা শনাক্ত করা যায়নি!');
+    return;
+  }
+
+  // ৩. টেক্সট ডায়েরিতে পুশ এবং যদি AI সুইচ চালু থাকে তবে ব্যাকরণ ঠিক করা
+  if (autoRefine && apiKey && navigator.onLine) {
+    setStatus('✨ AI ব্যাকরণ ও বানান পরিপাটি করছে...', 'rgba(106, 27, 154, 0.4)');
+    google.script.run
+      .withSuccessHandler(function(res) {
+        var refined = (res && res.success && res.text) ? res.text : finalVoiceTranscript;
+        appendVoiceTextToPage(refined, targetPage);
+        resetVoiceButton();
+        setStatus('☁️ সংরক্ষিত (' + currentDiary + ')', 'rgba(30, 142, 62, 0.4)');
+        showToast('✨ কথা সরাসরি ডায়েরিতে যোগ ও AI দিয়ে শুদ্ধ হয়েছে!');
+      })
+      .withFailureHandler(function() {
+        appendVoiceTextToPage(finalVoiceTranscript, targetPage);
+        resetVoiceButton();
+        setStatus('☁️ সংরক্ষিত (' + currentDiary + ')', 'rgba(30, 142, 62, 0.4)');
+        showToast('⚡ কথা সরাসরি ডায়েরিতে যোগ হয়েছে!');
+      })
+      .processWithGemini(finalVoiceTranscript, apiKey);
+  } else {
+    appendVoiceTextToPage(finalVoiceTranscript, targetPage);
+    resetVoiceButton();
+    setStatus('☁️ সংরক্ষিত (' + currentDiary + ')', 'rgba(30, 142, 62, 0.4)');
+    showToast('⚡ কথা সরাসরি ডায়েরিতে যোগ হয়েছে!');
+  }
+}
+
 function appendVoiceTextToPage(text, page) {
   if (!text || !page) return;
   var contentEl = page.querySelector('.diary-content');
@@ -1710,91 +2096,6 @@ function appendVoiceTextToPage(text, page) {
     window.savePageData(pData, false);
   }
 }
-
-function processVoiceTranscript(rawText, page) {
-  var text = String(rawText || '').trim();
-  if (!text || !page) return;
-
-  var autoRefine = isAiAutoRefineEnabled();
-
-  if (!autoRefine) {
-    appendVoiceTextToPage(text, page);
-    setStatus('☁️ সংরক্ষিত (' + currentDiary + ')', 'rgba(30, 142, 62, 0.4)');
-    showToast('⚡ ভয়েসের লেখা সরাসরি ডায়েরিতে যোগ হয়েছে!');
-    return;
-  }
-
-  var apiKey = localStorage.getItem('gemini_diary_api_key') || '';
-  if (!apiKey) {
-    showToast('⚠️ AI অটো-রিফাইন অন থাকলেও API Key নেই, সরাসরি যোগ করা হলো।');
-    appendVoiceTextToPage(text, page);
-    return;
-  }
-
-  setStatus('🤖 AI দিয়ে লেখা সাজানো হচ্ছে...', 'rgba(106, 27, 154, .4)');
-  if (typeof google !== 'undefined' && google.script && google.script.run) {
-    google.script.run
-      .withSuccessHandler(function(res) {
-        setStatus('☁️ সংরক্ষিত', 'rgba(30, 142, 62, .4)');
-        if (res && res.success && res.text) {
-          appendVoiceTextToPage(res.text, page);
-          showToast('✨ ভয়েস যোগ হয়েছে এবং AI দিয়ে শুদ্ধ করা হয়েছে!');
-        } else {
-          appendVoiceTextToPage(text, page);
-        }
-      })
-      .withFailureHandler(function() {
-        setStatus('☁️ সংরক্ষিত', 'rgba(30, 142, 62, .4)');
-        appendVoiceTextToPage(text, page);
-      })
-      .processWithGemini(text, apiKey);
-  } else {
-    appendVoiceTextToPage(text, page);
-  }
-}
-
-window.addEventListener('message', function(event) {
-  var data = event && event.data;
-  if (!data || data.type !== 'DIARY_VOICE_TRANSCRIPT') return;
-  if (!voiceHelperWindow || event.source !== voiceHelperWindow) return;
-  if (!voiceSessionToken || data.token !== voiceSessionToken) return;
-
-  var text = String(data.text || '').trim();
-  var target = voiceTargetPage;
-  voiceSessionToken = null;
-  voiceHelperWindow = null;
-  isVoiceRecording = false;
-
-  if (!text) {
-    showToast('⚠️ কোনো ভয়েস লেখা পাওয়া যায়নি।');
-    return;
-  }
-  processVoiceTranscript(text, target);
-});
-
-window.toggleVoiceDiary = function() {
-  var pages = document.querySelectorAll('.diary-page');
-  var page = pages.length > 0 ? pages[pages.length - 1] : null;
-  if (!page) {
-    window.handleAddNewPage();
-    pages = document.querySelectorAll('.diary-page');
-    page = pages[pages.length - 1];
-  }
-  voiceTargetPage = page;
-  voiceSessionToken = 'v_' + Date.now();
-  isVoiceRecording = true;
-  var separator = VOICE_HELPER_URL.indexOf('?') === -1 ? '?' : '&';
-  var url = VOICE_HELPER_URL + separator + 'token=' + encodeURIComponent(voiceSessionToken) + '&parentOrigin=' + encodeURIComponent(window.location.origin);
-  voiceHelperWindow = window.open(url, 'diaryVoiceHelper', 'popup=yes,width=520,height=720,resizable=yes,scrollbars=yes');
-  if (!voiceHelperWindow) {
-    isVoiceRecording = false;
-    voiceSessionToken = null;
-    showToast('⚠️ পপ-আপ ব্লক করা আছে! Browser-এ Popup Allow করুন।');
-    return;
-  }
-  try { voiceHelperWindow.focus(); } catch (e) {}
-  showToast('🎙️ নতুন Voice Helper উইন্ডোতে কথা রেকর্ড করুন।');
-};
 
 window.handlePrintPdf = function(isFullDiary) {
   var menu = document.getElementById('downloadMenu');
@@ -1899,8 +2200,9 @@ window.exportWord = function(isFullDiary) {
 
 window.onload = function() {
   updateAiSwitchUI(isAiAutoRefineEnabled());
+  initSpeechRecognition();
 
-  /* সাইট রিলোড বা বন্ধ করে ফিরে আসলেও আনলক স্টেট ও সময় যাচাই */
+  /* আনলক স্টেট ও পার্সিস্টেন্স যাচাই */
   try {
     var unl = localStorage.getItem("diary_personal_unlocked") === "true";
     var lastTime = parseInt(localStorage.getItem("diary_last_active_time") || "0", 10);
@@ -1929,4 +2231,3 @@ window.onload = function() {
 </script>
 </body>
 </html>
-
