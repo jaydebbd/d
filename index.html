@@ -373,11 +373,11 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
 }
 .page-save-indicator { font-size: 12px; color: #555; font-weight: 500; }
 
-/* পেজের একদম ডান ঘেঁষে, কিছুটা উপরে ফিক্সড, স্বচ্ছ ঝাপসা মাইক বাটন */
+/* পেজের একদম ডান ঘেঁষে দৃশ্যমান ও স্পষ্ট ফিক্সড মাইক বাটন */
 .voice-bar-wrapper {
   position: fixed;
   top: 45vh;
-  right: 5px;
+  right: 8px;
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -385,40 +385,36 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
   pointer-events: auto;
 }
 .voice-fab {
-  width: 44px;
-  height: 44px;
-  border: 1.5px solid rgba(26, 115, 232, 0.4);
+  width: 48px;
+  height: 48px;
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
   border-radius: 50%;
-  background: rgba(26, 115, 232, 0.35);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  color: #0d47a1;
-  font-size: 20px;
+  background: linear-gradient(135deg, rgba(26, 115, 232, 0.8), rgba(13, 71, 161, 0.8));
+  color: #fff;
+  font-size: 22px;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.42;
-  transition: all 0.25s ease;
+  opacity: 0.78;
+  transition: all 0.2s ease;
 }
 .voice-fab:hover, .voice-fab:active {
-  opacity: 0.95;
-  background: rgba(26, 115, 232, 0.85);
-  color: #fff;
+  opacity: 1;
   transform: scale(0.96);
+  box-shadow: 0 4px 16px rgba(26, 115, 232, 0.5);
 }
 .voice-fab.recording {
-  opacity: 0.95;
-  background: rgba(217, 48, 37, 0.85);
-  color: #fff;
-  border-color: #d93025;
+  opacity: 1;
+  background: #d93025;
+  border-color: #fff;
   box-shadow: 0 0 0 0 rgba(217,48,37,.45);
   animation: pulseMic 1.2s infinite;
 }
 @keyframes pulseMic {
   0% { box-shadow: 0 0 0 0 rgba(217,48,37,.6); }
-  70% { box-shadow: 0 0 0 14px rgba(217,48,37,0); }
+  70% { box-shadow: 0 0 0 15px rgba(217,48,37,0); }
   100% { box-shadow: 0 0 0 0 rgba(217,48,37,0); }
 }
 
@@ -558,7 +554,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
   <div id="entriesList" style="display:none;"></div>
 </div>
 
-<!-- পেজের একদম ডান ঘেঁষে স্বচ্ছ ঝাপসা ফিক্সড মাইক বাটন -->
+<!-- পেজের ডান সাইডে ভাসমান স্পষ্ট মাইক বাটন -->
 <div class="voice-bar-wrapper" id="voiceFabWrapper" style="display:none;">
   <button type="button" id="voiceFab" class="voice-fab" title="মুখে কথা বলে লিখুন" onclick="window.toggleDirectVoice()">🎙️</button>
 </div>
@@ -569,7 +565,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
   <div class="custom-modal-card">
     <div class="modal-title" style="color:#6a1b9a;">🤖 Gemini API কী সেট করুন</div>
     <div style="font-size: 13px; color: #555; margin-bottom: 8px; line-height: 1.5;">
-      ভয়েস-টু-টেক্সট নিখুঁত করতে এবং ব্যাকরণ/দাঁড়ি-কমা ঠিক করতে আপনার গুগল জেমিনির API Key দিন[span_2](start_span)[span_2](end_span)[span_3](start_span)[span_3](end_span)।
+      ভয়েস-টু-টেক্সট নিখুঁত করতে এবং ব্যাকরণ/দাঁড়ি-কমা ঠিক করতে আপনার গুগল জেমিনির API Key দিন।
     </div>
     <input type="password" id="geminiApiKeyInput" class="modal-input" placeholder="Gemini API Key (AIzaSy...)" />
     <div class="modal-actions">
@@ -639,7 +635,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
 
 <script src="config.js"></script>
 <script>
-/* JB-Diary GitHub Frontend → Apps Script JSONP Bridge[span_4](start_span)[span_4](end_span) */
+/* JB-Diary GitHub Frontend → Apps Script JSONP Bridge */
 (function () {
   'use strict';
   window.JB_DIARY_API_URL = window.JB_DIARY_API_URL || 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_EXEC_URL_HERE';
@@ -756,7 +752,7 @@ var currentActiveDateKey = "";
 var saveTimers = {};
 var isSyncingPending = false;
 
-/* অটো-লক (২০ মিনিট নিষ্ক্রিয় থাকলে) এবং স্থায়ী আনলক স্টেট[span_5](start_span)[span_5](end_span) */
+/* অটো-লক (২০ মিনিট নিষ্ক্রিয় থাকলে) এবং স্থায়ী আনলক স্টেট */
 var AUTO_LOCK_TIMEOUT_MS = 20 * 60 * 1000;
 var lastActivityTime = Date.now();
 
@@ -789,7 +785,7 @@ document.addEventListener("visibilitychange", function() {
   }
 });
 
-/* অফলাইন স্টোরেজ ও পেন্ডিং কিউ লজিক[span_6](start_span)[span_6](end_span) */
+/* অফলাইন স্টোরেজ ও পেন্ডিং কিউ লজিক */
 function getStorageKey(diary) {
   return "offline_diary_pages_" + (diary || currentDiary);
 }
@@ -958,7 +954,7 @@ function showToast(msg) {
   }
 }
 
-/* পোর্টাল ইন্টারফেস লজিক[span_7](start_span)[span_7](end_span) */
+/* পোর্টাল ইন্টারফেস লজিক */
 window.switchPortalTab = function(type) {
   checkInactivityTimeout();
   if (type === "personal" && !isPersonalUnlocked) {
@@ -1013,6 +1009,9 @@ window.enterDiaryPage = function(dName) {
 
 window.returnToHomePortal = function() {
   if (isDirectRecording) window.stopDirectVoice(true);
+  try {
+    localStorage.removeItem("last_opened_diary_name");
+  } catch(e) {}
   document.getElementById('mainDiaryView').style.display = 'none';
   document.getElementById('voiceFabWrapper').style.display = 'none';
   document.getElementById('portalView').style.display = 'block';
@@ -1240,6 +1239,9 @@ window.confirmCreateDiary = function() {
       .withSuccessHandler(function(res) {
         if (res && res.success) {
           currentDiary = name;
+          try {
+            localStorage.setItem("last_opened_diary_name", currentDiary);
+          } catch(e) {}
           if (cat === "personal") {
             isPersonalUnlocked = true;
             updateLastActivity();
@@ -1259,6 +1261,9 @@ window.switchDiary = function(dName) {
     return;
   }
   currentDiary = dName;
+  try {
+    localStorage.setItem("last_opened_diary_name", currentDiary);
+  } catch(e) {}
   renderDiaryDropdown();
   var cachedPages = getFromLocalStorage(currentDiary);
   if (cachedPages && cachedPages.length > 0) {
@@ -1334,6 +1339,9 @@ function buildDateDropdown() {
 
 window.selectDateKey = function(dateKey) {
   currentActiveDateKey = dateKey;
+  try {
+    localStorage.setItem("last_selected_date_key", dateKey);
+  } catch(e) {}
   var bannerText = document.getElementById('dateBannerText');
   var btnReturn = document.getElementById('btnReturnToday');
   if (dateKey === window.todayDateKey) {
@@ -1370,7 +1378,15 @@ function handleLoadedData(res) {
       }
     }
     saveToLocalStorage(currentDiary, allLoadedPages);
-    window.selectDateKey(window.todayDateKey);
+    
+    // রিলোড করার পর নির্বাচিত তারিখ পুনরুদ্ধার করা
+    var savedDateKey = localStorage.getItem("last_selected_date_key");
+    if (savedDateKey) {
+      window.selectDateKey(savedDateKey);
+    } else {
+      window.selectDateKey(window.todayDateKey);
+    }
+
     if (navigator.onLine) {
       setStatus('☁️ ' + currentDiary + ' ড্রাইভের সাথে যুক্ত', 'rgba(30, 142, 62, 0.4)');
       syncPendingQueue();
@@ -1638,7 +1654,7 @@ window.refineWithAI = function(btn) {
     return;
   }
   if (!text) {
-    showToast('⚠️️ আগে পাতায় কিছু লিখুন!');
+    showToast('⚠️ আগে পাতায় কিছু লিখুন!');
     return;
   }
   btn.innerText = '✨ AI সাজাচ্ছে...';
@@ -1672,7 +1688,7 @@ window.refineWithAI = function(btn) {
 };
 
 /* ==========================================================================
-   স্মার্ট ভয়েস-টু-টেক্সট ইঞ্জিন (voice.html-এর ডুয়াল ট্রান্সক্রিপশন লজিক[span_8](start_span)[span_8](end_span))
+   স্মার্ট ভয়েস-টু-টেক্সট ইঞ্জিন (voice.html-এর ডুয়াল ট্রান্সক্রিপশন লজিক)
    ========================================================================== */
 var isDirectRecording = false;
 var isDirectProcessing = false;
@@ -1816,7 +1832,7 @@ function initCleanSpeechRecognition() {
         liveBrowserFinalSegments = finals;
       }
 
-      // ৪ সেকেন্ড কোনো কথা না বললে স্বয়ংক্রিয়ভাবে বন্ধ হবে[span_9](start_span)[span_9](end_span)
+      // ৪ সেকেন্ড কোনো কথা না বললে স্বয়ংক্রিয়ভাবে বন্ধ হবে
       clearTimeout(silenceTimer);
       silenceTimer = setTimeout(function() {
         if (isDirectRecording) {
@@ -1990,7 +2006,7 @@ async function processVoiceDataAndAppend() {
   var finalDeliveredText = '';
   var apiKey = getStoredGeminiKey();
 
-  // ১. জেমিনি অডিও ট্রান্সক্রিপ্ট (voice.html-এর মতো নিখুঁত অডিও মডেল[span_10](start_span)[span_10](end_span))
+  // ১. জেমিনি অডিও ট্রান্সক্রিপ্ট
   if (apiKey && audioBlob.size > 0 && navigator.onLine) {
     try {
       setStatus('🤖 Gemini AI ট্রান্সক্রিপ্ট ও দাঁড়ি-কমা ঠিক করছে...', 'rgba(106, 27, 154, 0.4)');
@@ -2003,12 +2019,12 @@ async function processVoiceDataAndAppend() {
     }
   }
 
-  // ২. ফলব্যাক: যদি অডিও ট্রান্সক্রিপ্ট ব্যর্থ হয় তবে ব্রাউজার টেক্সট নেওয়া
+  // ২. ফলব্যাক: ব্রাউজার টেক্সট
   if (!finalDeliveredText) {
     finalDeliveredText = browserFallbackText;
   }
 
-  // ৩. টেক্সট থাকলে এবং API থাকলে Gemini দিয়ে পুনরাবৃত্তি/বানান পরিষ্কারকরণ[span_11](start_span)[span_11](end_span)[span_12](start_span)[span_12](end_span)
+  // ৩. টেক্সট থাকলে এবং API থাকলে Gemini দিয়ে পুনরাবৃত্তি/বানান পরিষ্কারকরণ
   if (finalDeliveredText && apiKey && navigator.onLine && typeof google !== 'undefined' && google.script && google.script.run) {
     try {
       setStatus('✨ Gemini দিয়ে পরিপাটি অনুচ্ছেদ সাজানো হচ্ছে...', 'rgba(106, 27, 154, 0.4)');
@@ -2165,7 +2181,7 @@ window.exportWord = function(isFullDiary) {
 window.onload = function() {
   initCleanSpeechRecognition();
 
-  /* আনলক স্টেট ও পার্সিস্টেন্স যাচাই[span_13](start_span)[span_13](end_span) */
+  /* আনলক স্টেট ও পার্সিস্টেন্স যাচাই */
   try {
     var unl = localStorage.getItem("diary_personal_unlocked") === "true";
     var lastTime = parseInt(localStorage.getItem("diary_last_active_time") || "0", 10);
@@ -2185,7 +2201,21 @@ window.onload = function() {
         if (res) {
           diaryList = res.list || [];
           diaryCategories = res.categories || {};
-          renderPortalItems();
+          
+          // রিলোড করার পর সর্বশেষ খোলা ডায়েরি বজায় রাখা
+          var lastDiary = localStorage.getItem("last_opened_diary_name");
+          if (lastDiary && diaryList.indexOf(lastDiary) !== -1) {
+            if (diaryCategories[lastDiary] === "personal" && !isPersonalUnlocked) {
+              renderPortalItems();
+            } else {
+              document.getElementById('portalView').style.display = 'none';
+              document.getElementById('mainDiaryView').style.display = 'block';
+              document.getElementById('voiceFabWrapper').style.display = 'flex';
+              window.switchDiary(lastDiary);
+            }
+          } else {
+            renderPortalItems();
+          }
         }
       })
       .listAllDiaries();
@@ -2194,4 +2224,3 @@ window.onload = function() {
 </script>
 </body>
 </html>
-
