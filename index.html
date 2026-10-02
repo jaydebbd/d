@@ -471,6 +471,84 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
 .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
 .btn-modal-cancel { background: #f1f3f4; color: #444; border: none; border-radius: 7px; padding: 8px 14px; font-size: 13.5px; cursor: pointer; }
 .btn-modal-confirm { background: #1a73e8; color: white; border: none; border-radius: 7px; padding: 8px 16px; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+
+/* ==========================================================================
+   প্রিন্ট ও PDF ফরম্যাটিং (অপ্রয়োজনীয় অংশ লুকিয়ে কেবল ডায়েরির পাতা প্রিন্ট করা)
+   ========================================================================== */
+.print-only-header {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 15mm 15mm;
+  }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  /* অপ্রয়োজনীয় নেভিগেশন ও বাটনগুলো প্রিন্টে লুকানো */
+  .header, .portal-container, .diary-bar, .action-bar, .active-date-banner,
+  .page-footer, .voice-bar-wrapper, .toast-msg, .custom-modal-overlay, #loadingBox {
+    display: none !important;
+  }
+  .container {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+  /* প্রিন্টের জন্য পরিচ্ছন্ন কাস্টম হেডার */
+  .print-only-header {
+    display: block !important;
+    text-align: center;
+    border-bottom: 2px solid #8c7355;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+  .print-only-header h2 {
+    font-size: 20px;
+    color: #1a73e8;
+    margin-bottom: 4px;
+  }
+  .print-only-header p {
+    font-size: 13px;
+    color: #555;
+  }
+  /* ডায়েরির পাতার প্রিন্ট লুক */
+  .diary-page {
+    background: #fff !important;
+    box-shadow: none !important;
+    border: 1.5px solid #8c7355 !important;
+    page-break-after: always;
+    break-after: page;
+    margin-bottom: 20px !important;
+    padding: 16px !important;
+  }
+  .diary-page::before {
+    display: none !important;
+  }
+  .page-number-badge {
+    background: transparent !important;
+    color: #333 !important;
+    border: 1px solid #8c7355 !important;
+  }
+  .entry-timestamp {
+    color: #1a73e8 !important;
+  }
+  .diary-content {
+    min-height: auto !important;
+    border-bottom: none !important;
+    font-size: 15px !important;
+    line-height: 1.8 !important;
+  }
+  .photo-del {
+    display: none !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -516,6 +594,13 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
 
 <!-- মূল ডায়েরি ভিউ -->
 <div class="container" id="mainDiaryView" style="display:none;">
+
+  <!-- প্রিন্ট হেডার (শুধু প্রিন্ট করার সময় দেখা যাবে) -->
+  <div class="print-only-header" id="printOnlyHeader">
+    <h2 id="printHeaderTitle">📔 ডায়েরি</h2>
+    <p id="printHeaderSubtitle">তারিখ ও সময়</p>
+  </div>
+
   <div class="diary-bar">
     <div class="dropdown">
       <button type="button" class="btn-diary-toggle" id="btnDiaryToggle" onclick="window.handleToggleDiaryMenu(event)">
@@ -579,7 +664,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
   <div class="custom-modal-card">
     <div class="modal-title" style="color:#6a1b9a;">🤖 Gemini API কী সেট করুন</div>
     <div style="font-size: 13px; color: #555; margin-bottom: 8px; line-height: 1.5;">
-      ভয়েস-টু-টেক্সট নিখুঁত করতে এবং ব্যাকরণ/দাঁড়ি-কমা ঠিক করতে আপনার গুগল জেমিনির API Key দিন[span_0](start_span)[span_0](end_span)।
+      ভয়েস-টু-টেক্সট নিখুঁত করতে এবং ব্যাকরণ/দাঁড়ি-কমা ঠিক করতে আপনার গুগল জেমিনির API Key দিন[span_4](start_span)[span_4](end_span)।
     </div>
     <input type="password" id="geminiApiKeyInput" class="modal-input" placeholder="Gemini API Key (AIzaSy...)" />
     <div class="modal-actions">
@@ -666,7 +751,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
 <!-- Delete Diary Confirmation Modal -->
 <div id="deleteDiaryModalOverlay" class="custom-modal-overlay" style="display:none;">
   <div class="custom-modal-card">
-    <div class="modal-title" style="color: #d93025;">🗑️️ ডায়েরি সম্পূর্ণ মুছে ফেলবেন?</div>
+    <div class="modal-title" style="color: #d93025;">🗑️ ডায়েরি সম্পূর্ণ মুছে ফেলবেন?</div>
     <div style="font-size: 13.5px; color: #444; margin-bottom: 12px; line-height: 1.5;">
       আপনি কি নিশ্চিত যে <b id="delTargetDiaryName" style="color: #d93025;"></b> ডায়েরিটি এবং গুগল ড্রাইভের এর সকল শিট ও ফাইল চিরতরে মুছে ফেলতে চান? এটি আর ফিরিয়ে আনা যাবে না!
     </div>
@@ -679,7 +764,7 @@ body { background-color: var(--bg); color: var(--text); padding-bottom: 85px; wi
 
 <script src="config.js"></script>
 <script>
-/* JB-Diary GitHub Frontend → Apps Script JSONP Bridge[span_1](start_span)[span_1](end_span) */
+/* JB-Diary GitHub Frontend → Apps Script JSONP Bridge[span_5](start_span)[span_5](end_span) */
 (function () {
   'use strict';
   window.JB_DIARY_API_URL = window.JB_DIARY_API_URL || 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_EXEC_URL_HERE';
@@ -924,7 +1009,7 @@ document.addEventListener("visibilitychange", function() {
   }
 });
 
-/* অফলাইন স্টোরেজ ও পেন্ডিং কিউ লজিক[span_2](start_span)[span_2](end_span) */
+/* অফলাইন স্টোরেজ ও পেন্ডিং কিউ লজিক[span_6](start_span)[span_6](end_span) */
 function getStorageKey(diary) {
   return "offline_diary_pages_" + (diary || currentDiary);
 }
@@ -984,7 +1069,7 @@ function syncPendingQueue() {
     if (currentQueue.length === 0) {
       isSyncingPending = false;
       setStatus('☁️ ড্রাইভ ও শিট সংযুক্ত', 'rgba(30, 142, 62, 0.4)');
-      showToast('☁️️ অফলাইনের সব লেখা অনলাইনে সংরক্ষিত হয়েছে!');
+      showToast('☁️ অফলাইনের সব লেখা অনলাইনে সংরক্ষিত হয়েছে!');
       return;
     }
     var item = currentQueue[0];
@@ -1093,7 +1178,7 @@ function showToast(msg) {
   }
 }
 
-/* পোর্টাল ইন্টারফেস লজিক[span_3](start_span)[span_3](end_span) */
+/* পোর্টাল ইন্টারফেস লজিক[span_7](start_span)[span_7](end_span) */
 window.switchPortalTab = function(type) {
   checkInactivityTimeout();
   if (type === "personal" && !isPersonalUnlocked) {
@@ -2112,7 +2197,7 @@ function resetVoiceUI() {
   var btn = document.getElementById('voiceFab');
   if (btn) {
     btn.classList.remove('recording');
-    btn.innerHTML = '🎙️️';
+    btn.innerHTML = '🎙️';
     btn.title = 'মুখে কথা বলে লিখুন';
   }
 }
@@ -2152,7 +2237,7 @@ window.startDirectVoice = function() {
         isDirectRecording = true;
         btn.classList.add('recording');
         btn.innerHTML = '⏹️';
-        setStatus('🔴 শুনছি... কথা শেষ হলে ৪ সেকেন্ড থামুন বা ⏹️️ চাপুন', 'rgba(217, 48, 37, 0.4)');
+        setStatus('🔴 শুনছি... কথা শেষ হলে ৪ সেকেন্ড থামুন বা ⏹️ চাপুন', 'rgba(217, 48, 37, 0.4)');
       } catch (err) {
         showToast('❌ মাইক্রোফোন চালু করা যায়নি');
       }
@@ -2317,33 +2402,49 @@ function pushCleanTextToPage(text) {
   showToast('✨ কথা সফলভাবে ডায়েরিতে যুক্ত হয়েছে!');
 }
 
+/* ==========================================================================
+   প্রিন্ট ও PDF লজিক (শুধুমাত্র ডায়েরির পাতা ও শিরোনাম প্রিন্ট হওয়া)
+   ========================================================================== */
 window.handlePrintPdf = function(isFullDiary) {
   var menu = document.getElementById('downloadMenu');
   if (menu) menu.style.display = 'none';
-  if (!isFullDiary) {
-    window.print();
-    return;
-  }
+
+  var printTitle = document.getElementById('printHeaderTitle');
+  var printSub = document.getElementById('printHeaderSubtitle');
   var list = document.getElementById('entriesList');
-  if (!list) return;
-  var dates = [];
-  for (var i = 0; i < allLoadedPages.length; i++) {
-    var d = allLoadedPages[i].dateKey || window.todayDateKey;
-    if (dates.indexOf(d) === -1) dates.push(d);
-  }
-  dates.sort();
-  list.innerHTML = '';
-  for (var j = 0; j < dates.length; j++) {
-    var curDate = dates[j];
-    var dayPages = allLoadedPages.filter(function(p) { return (p.dateKey || window.todayDateKey) === curDate; });
-    for (var k = 0; k < dayPages.length; k++) {
-      list.appendChild(createPageElement(dayPages[k]));
+
+  if (!isFullDiary) {
+    // আজকের বা নির্বাচিত দিনের পৃষ্ঠা প্রিন্ট
+    if (printTitle) printTitle.innerText = '📔 ' + currentDiary;
+    if (printSub) printSub.innerText = formatDateKeyToSlashBn(currentActiveDateKey);
+    window.print();
+  } else {
+    // সম্পূর্ণ ডায়েরির সব পৃষ্ঠা প্রিন্ট
+    if (printTitle) printTitle.innerText = '📔 ' + currentDiary + ' (সম্পূর্ণ ডায়েরি)';
+    if (printSub) printSub.innerText = 'সর্বমোট পাতা সংখ্যা: ' + toBn(allLoadedPages.length);
+
+    var originalHtml = list.innerHTML;
+    var dates = [];
+    for (var i = 0; i < allLoadedPages.length; i++) {
+      var d = allLoadedPages[i].dateKey || window.todayDateKey;
+      if (dates.indexOf(d) === -1) dates.push(d);
     }
+    dates.sort();
+    list.innerHTML = '';
+    for (var j = 0; j < dates.length; j++) {
+      var curDate = dates[j];
+      var dayPages = allLoadedPages.filter(function(p) { return (p.dateKey || window.todayDateKey) === curDate; });
+      for (var k = 0; k < dayPages.length; k++) {
+        list.appendChild(createPageElement(dayPages[k]));
+      }
+    }
+    window.print();
+    // প্রিন্ট ডায়ালগ বন্ধ হলে আগের ভিউ ফিরিয়ে আনা
+    setTimeout(function() {
+      list.innerHTML = originalHtml;
+      renderCurrentDatePages();
+    }, 1200);
   }
-  window.print();
-  setTimeout(function() {
-    renderCurrentDatePages();
-  }, 1000);
 };
 
 window.exportWord = function(isFullDiary) {
@@ -2424,7 +2525,7 @@ window.onload = function() {
 
   initCleanSpeechRecognition();
 
-  /* আনলক স্টেট ও পার্সিস্টেন্স যাচাই[span_4](start_span)[span_4](end_span) */
+  /* আনলক স্টেট ও পার্সিস্টেন্স যাচাই[span_8](start_span)[span_8](end_span) */
   try {
     var unl = localStorage.getItem("diary_personal_unlocked") === "true";
     var lastTime = parseInt(localStorage.getItem("diary_last_active_time") || "0", 10);
